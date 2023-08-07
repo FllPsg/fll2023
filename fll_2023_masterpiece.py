@@ -9,8 +9,19 @@ from pybricks.ev3devices import Motor
 from pybricks.robotics import DriveBase
 from pybricks.parameters import Stop
 from pybricks.ev3devices import ColorSensor
-from pybricks.tools import wait
+from pybricks.tools import wait, DataLog, StopWatch
 import io
+
+NEED_LOGGING = False
+if NEED_LOGGING:
+    Stopwatch =StopWatch()
+    data_log = DataLog('LogMessage')
+
+    def LogMsg(msg):
+        data_log.log(msg)
+else:
+    def LogMsg(msg):
+        pass
 
 # Initialize the EV3 Brick.
 ev3 = EV3Brick()
@@ -73,44 +84,82 @@ def gems2blackfwd(white_level,black_level, speed, port):
             gyro_error = 0-gyro.angle()
             robot.drive(speed, 3*gyro_error)
         robot.stop(Stop.BRAKE)
+
+def calc_var_acc_speed(cdist, axdist, dxdist, sspeed, tspeed):
+    """ Compute the speed based on current position of the robot
+    Paramters:
+        cdist = Current distance in % of total distance
+        axdist = Acceleration distance in % of total distance
+        dxdist = Deceleration distance in  % of total distance
+        sspeed = Starting speed
+        tspeeed = Top speed
+    returns:
+        drspeed = drive speed in whatever unit given.
+    """
+    # If the current position of the robot is before the distance of the cruising point
+    # calculate speed depending on the current location. The additional speed added to the
+    # minimum starting speed is proportional to the distance travelled
+    if cdist >= 0 and cdist <= axdist:
+         drspeed = (tspeed-sspeed)/(axdist)*cdist+sspeed
+   
+    # If the current position of robot is in the distance between the end of
+    # acceleration and start of decleration (curising distance), set the speed to
+    # top speed
+    elif cdist >= axdist and cdist <= 1 - dxdist:
+        drspeed = tspeed
+   
+   # If the current position of the robot is in the deccelration zone calculate the speed
+    # as per the current location. As the robot goes closer and closer to the destination,
+    # amount of deceleration is also reduced. By the time the robot reaches the destination,
+    # the speed expected to be same as the starting speed.
     
-def accDecDrive(rotations,speed):
+    elif cdist >= 1-dxdist and cdist <= 1:
+        drspeed = (tspeed-sspeed)/(-dxdist)*(cdist-(1-dxdist))+tspeed
+    
+    # setting the power to min before the drive/turn and after
+    else:
+        drspeed = sspeed
+
+    # return the computed speed
+    return drspeed
+
+def accDecDrive(total_dist, start_speed = 30, top_speed = 300, acc_dist=0.1, dec_dist=0.1):
+    """ Acceleration/Deceleration Drive with variable acceleration
+        Parameters:
+            total_dist = The total target distance. Given in number of rotations.
+                        Negative distance is for backward direction
+            start_speed = Starting speed
+            top_speed = The top speed (curising speed after raising acceleration)
+            acc_dist = The distance from the starting posion, how far the acceleration is done
+                    At the end of this distance, the cruising will start (no acceleration)
+                    This is distance from start as % of total_distance
+            dec_dist = Deceleration distance. The disaance from the end how far deceleration shuld be one
+                    This is given % of total_distance.
+    """
+    #Proportional factor for PID
+    # I and D are not used.
+    kp = 2
+
     gyro.reset_angle(0)
     left_motor.reset_angle(0)
     right_motor.reset_angle(0)
-    target_deg=rotations*360
-    target_speed = speed
-
-    #Initialize local variables
-    speed = 60
-    cruising_point = 0
-    dec_point = target_deg
+    #Convert distance in rotation to distance in angle and set the direction
+    direction = 1
+    if total_dist < 0:
+        direction = -1
+    total_dist = abs(total_dist*360)
 
     while True:
-        if abs(left_motor.angle())>=target_deg:
+        current_dist = abs(left_motor.angle())
+        if current_dist >= total_dist:
             robot.stop(Stop.BRAKE)
             break
         else:
+            drive_speed = calc_var_acc_speed(current_dist/total_dist, acc_dist, dec_dist, start_speed, top_speed)
             gyro_error = 0-(gyro.angle())
-            if speed < 0:
-                gyro_error *= -1
-            robot.drive(speed, 2*gyro_error)     
-            if (abs(left_motor.angle())>=dec_point):
-                #Decelarate from deceleration point
-                speed -= 5
-                ev3.screen.print(str(speed))
-            elif (speed < target_speed):
-                # Accelerate till cruising pont where the top speed = target_speed
-                speed += 5
-                if speed >= target_speed:
-                    cruising_point = abs(left_motor.angle())
-                    if target_deg > (2 * cruising_point):
-                        dec_point = target_deg - cruising_point
-                    else:
-                        dec_point = cruising_point
-                        ev3.screen.print("*** Target distance too small!")
-                        ev3.speaker.beep()
-                ev3.screen.print(str(speed))
+            robot.drive(drive_speed*direction, kp*gyro_error)
+            LogMsg("Speed: {}, Distance: {}, Error: {}".format(drive_speed, current_dist, gyro_error))
+        wait(10)
 
 def gems(rotations,speed):
     gyro.reset_angle(0)
@@ -165,91 +214,72 @@ def gyrospinturn(angle,speed):
             right_motor.stop(Stop.BRAKE)
             break
 
-def show_menu():
-    global current_row
-    button_pressed=False
+def show_menu(row):
     ev3.screen.clear()
-    ev3.screen.print("Run 1 ***")
-    ev3.screen.print("Run 2")
-    ev3.screen.print("Run 3")
-    ev3.screen.print("Exit")
+    if row == 1:
+        ev3.screen.print("Run 1 ***")
+        ev3.screen.print("Run 2")
+        ev3.screen.print("Run 3")
+    elif row == 2:
+        ev3.screen.print("Run 1")
+        ev3.screen.print("Run 2 ***")
+        ev3.screen.print("Run 3")
+    elif row == 3:
+        ev3.screen.print("Run 1")
+        ev3.screen.print("Run 2")
+        ev3.screen.print("Run 3 ***")
+
+def get_menu_selection():
+    global current_row
+    show_menu(current_row)       
     while True:
-        if Button.CENTER in ev3.buttons.pressed():
-            wait(150)
+        buttons_pressed = ev3.buttons.pressed()
+        wait(150)
+        center_pressed = Button.CENTER in buttons_pressed
+        up_pressed = Button.UP in buttons_pressed
+        down_pressed = Button.DOWN in buttons_pressed
+        if center_pressed:
             return current_row
-        elif Button.UP in ev3.buttons.pressed():
-            wait(150)
+        elif up_pressed:
             if current_row == 1:
-                current_row = 4
+                current_row = 3
             else:
                 current_row -= 1
-            button_pressed=True
-        elif Button.DOWN in ev3.buttons.pressed():
-            wait(150)
-            if current_row == 4:
+            show_menu(current_row)
+        elif down_pressed:
+            if current_row == 3:
                 current_row = 1
             else:
                 current_row += 1
-            button_pressed=True
-        if button_pressed:
-            if current_row == 1:
-                ev3.screen.clear()
-                ev3.screen.print("Run 1 ***")
-                ev3.screen.print("Run 2")
-                ev3.screen.print("Run 3")
-                ev3.screen.print("Exit")
-            elif current_row == 2:
-                ev3.screen.clear()
-                ev3.screen.print("Run 1")
-                ev3.screen.print("Run 2 ***")
-                ev3.screen.print("Run 3")
-                ev3.screen.print("Exit")
-            elif current_row == 3:
-                ev3.screen.clear()
-                ev3.screen.print("Run 1")
-                ev3.screen.print("Run 2")
-                ev3.screen.print("Run 3 ***")
-                ev3.screen.print("Exit")
-            elif current_row == 4:
-                ev3.screen.clear()
-                ev3.screen.print("Run 1")
-                ev3.screen.print("Run 2")
-                ev3.screen.print("Run 3")
-                ev3.screen.print("Exit ***")
-            button_pressed = False
+            show_menu(current_row)
 
 def run1():
-    gyrospinturn(-31,200)
-    accDecDrive(1.15,200)
-    gyrospinturn(-42,200)
-    accDecDrive(3.35,200)
-    gyrospinturn(45,200)
-    accDecDrive(1,200)
-    gyrospinturn(85,200)
-    # distance too small
-    accDecDrive(0.7,200)
-    gyrospinturn(-60,200)
-    accDecDrive(3,200)
-    gyrospinturn(22,200)
-    accDecDrive(5.5,300)
-    
-# Main program starts here
+    accDecDrive(total_dist=5.0, start_speed=30, top_speed = 300, acc_dist=0.2, dec_dist=0.2)
+
+def run2():
+    pass
+
+def run3():
+    pass
+
+#---------------------------------------  
+# Main program loop starts here
+#----------------------------------------
 current_row = 1
 while True:
-    key = show_menu()
+    key = get_menu_selection()
     ev3.screen.clear()
     if key == 1:
-        wait(150)
         ev3.screen.print("Run 1")
         run1()
-        show_menu()
     elif key == 2:
         ev3.screen.print("Run 2")
-        show_menu()
+        run2()
     elif key == 3:
         ev3.screen.print("Run 3")
-        show_menu()
+        run3()
     elif key == 4:
-        exit
+        break
+
 
     

@@ -6,12 +6,38 @@ from pybricks.ev3devices import ColorSensor
 from pybricks.tools import wait
 from pybricks.parameters import Button
 import io
+import uerrno
 
 # Initialize the EV3 Brick.
 ev3 = EV3Brick()
 
-LeftColorSensor = ColorSensor(Port.S1)
-RightColorSensor = ColorSensor(Port.S4)
+#Instantiate left color sensor device.
+while True:
+    try:
+        LeftColorSensor = ColorSensor(Port.S1)
+        break
+    except OSError as ex:
+    # OSError was raised, check for the kind of error
+    # If no device error (ENODEV), notify on the console
+        if ex.args[0] == uerrno.ENODEV:
+             # ENODEV is short for "Error, no device."
+            ev3.screen.print("Light1: No Device!")
+        else:
+            ev3.screen.print("Left Light: OSError {}".format(ex.args[0]))
+
+#Instantiate Right color sensor device
+while True:
+    try:
+        RightColorSensor = ColorSensor(Port.S4)
+        break
+    except OSError as ex:
+    # OSError was raised, check for the kind of error
+    # If no device error (ENODEV), notify on the console
+        if ex.args[0] == uerrno.ENODEV:
+             # ENODEV is short for "Error, no device."
+            ev3.screen.print("Light4: No Device!")
+        else:
+            ev3.screen.print("Light4: OSError {}".format(ex.args[0]))
 
 ev3.screen.clear()
 #ev3.screen.draw_text(5,5,"Port 1:Dark",Color.BLACK,background_color=None)
