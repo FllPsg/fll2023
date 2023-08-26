@@ -32,8 +32,15 @@ p4_50 = (p4w - p4b)*0.50+p4b
 ev3 = EV3Brick()
 
 # Initialize the motors.
-left_motor = Motor(Port.B)
-right_motor = Motor(Port.C)
+try:
+    left_motor = Motor(Port.B)
+except:
+    ev3.speaker.beep()
+
+try:
+    right_motor = Motor(Port.C)
+except:
+    ev3.speaker.beep()
 
 # Initialize the drive base.
 robot = DriveBase(left_motor, right_motor, wheel_diameter=56, axle_track=120)

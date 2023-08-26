@@ -11,6 +11,8 @@ from pybricks.parameters import Stop
 from pybricks.ev3devices import ColorSensor
 from pybricks.tools import wait, DataLog, StopWatch
 import io
+import uerrno
+from pybricks.experimental import run_parallel
 
 NEED_LOGGING = False
 if NEED_LOGGING:
@@ -26,23 +28,115 @@ else:
 # Initialize the EV3 Brick.
 ev3 = EV3Brick()
 
-# Initialize the motors.
-left_motor = Motor(Port.B, Direction.CLOCKWISE)
-right_motor = Motor(Port.C,Direction.CLOCKWISE)
-LeftColorSensor = ColorSensor(Port.S1)
-RightColorSensor = ColorSensor(Port.S4)
+# Instantiate the left large motor
+try:
+    left_motor = Motor(Port.B, Direction.CLOCKWISE)
+except OSError as ex:
+    # OSError was raised, check for the kind of error
+    # If no device error (ENODEV), notify on the console
+    if ex.args[0] == uerrno.ENODEV:
+        # ENODEV is short for "Error, no device."
+        ev3.screen.print("Left LM: No device!")
+    else:
+        ev3.screen.print("Left LM: OSError {}".format(ex.args[0]))
+    ev3.speaker.beep()
+    wait(3000)
 
-# Initialize the drive base.
+# Instantiate the right large motor
+try:
+    right_motor = Motor(Port.C,Direction.CLOCKWISE)
+except OSError as ex:
+    # OSError was raised, check for the kind of error
+    # If no device error (ENODEV), notify on the console
+    if ex.args[0] == uerrno.ENODEV:
+        # ENODEV is short for "Error, no device."
+        ev3.screen.print("Right LM: No device!")
+    else:
+        ev3.screen.print("Right LM: OSError {}".format(ex.args[0]))
+    ev3.speaker.beep()
+    wait(3000)
+
+#Insntantiate left color sensor
+try:
+    LeftColorSensor = ColorSensor(Port.S1)
+except OSError as ex:
+    # OSError was raised, check for the kind of error
+    # If no device error (ENODEV), notify on the console
+    if ex.args[0] == uerrno.ENODEV:
+        # ENODEV is short for "Error, no device."
+        ev3.screen.print("Left CS: No device!")
+    else:
+        ev3.screen.print("Left CS: OSError {}".format(ex.args[0]))
+    ev3.speaker.beep()
+    wait(3000)
+
+# Instantiate right color sensor
+try:
+    RightColorSensor = ColorSensor(Port.S4)
+except OSError as ex:
+    # OSError was raised, check for the kind of error
+    # If no device error (ENODEV), notify on the console
+    if ex.args[0] == uerrno.ENODEV:
+        # ENODEV is short for "Error, no device."
+        ev3.screen.print("Right CS: No device!")
+    else:
+        ev3.screen.print("Right CS: OSError {}".format(ex.args[0]))
+    ev3.speaker.beep()
+    wait(3000)
+
+# Instantiate Gyro sensor
+try:
+    gyro = GyroSensor(Port.S2, Direction.CLOCKWISE)
+except OSError as ex:
+    # OSError was raised, check for the kind of error
+    # If no device error (ENODEV), notify on the console
+    if ex.args[0] == uerrno.ENODEV:
+        # ENODEV is short for "Error, no device."
+        ev3.screen.print("Gyro: No device!")
+    else:
+        ev3.screen.print("Gyro: OSError {}".format(ex.args[0]))
+    ev3.speaker.beep()
+
+# Instantiate the left medium motor
+try:
+    left_medium_motor = Motor(Port.A, Direction.CLOCKWISE)
+except OSError as ex:
+    # OSError was raised, check for the kind of error
+    # If no device error (ENODEV), notify on the console
+    if ex.args[0] == uerrno.ENODEV:
+        # ENODEV is short for "Error, no device."
+        ev3.screen.print("Left MM: No device!")
+    else:
+        ev3.screen.print("Left MM: OSError {}".format(ex.args[0]))
+    ev3.speaker.beep()
+    wait(3000)
+
+# Instantiate the right medium motor
+try:
+    right_medium_motor = Motor(Port.D, Direction.CLOCKWISE)
+except OSError as ex:
+    # OSError was raised, check for the kind of error
+    # If no device error (ENODEV), notify on the console
+    if ex.args[0] == uerrno.ENODEV:
+        # ENODEV is short for "Error, no device."
+        ev3.screen.print("Right MM: No device!")
+    else:
+        ev3.screen.print("Right MM: OSError {}".format(ex.args[0]))
+    ev3.speaker.beep()
+    wait(3000)
+
+# Instantiate the drive base.
 robot = DriveBase(left_motor, right_motor, wheel_diameter=56, axle_track=120)
-gyro = GyroSensor(Port.S2, Direction.CLOCKWISE)
 
 try:
     infile = io.open("lval.txt",'r')
 except:
     ev3.screen.print("lval.txt does not \nexist!. \nPlease do light \nreading!")
+    ev3.speaker.beep()
     wait(10000)
     exit
 
+# Light value raw value to % mapping (for white (100%), blacn (0%) 45%, 55% and 50%)
 line = infile.readline()
 infile.close()
 lvals = line.split(' ')
@@ -99,6 +193,7 @@ def calc_var_acc_speed(cdist, axdist, dxdist, sspeed, tspeed):
     # If the current position of the robot is before the distance of the cruising point
     # calculate speed depending on the current location. The additional speed added to the
     # minimum starting speed is proportional to the distance travelled
+    # The idea: Slope equation of a line ( y = mx + c)
     if cdist >= 0 and cdist <= axdist:
          drspeed = (tspeed-sspeed)/(axdist)*cdist+sspeed
    
@@ -112,6 +207,7 @@ def calc_var_acc_speed(cdist, axdist, dxdist, sspeed, tspeed):
     # as per the current location. As the robot goes closer and closer to the destination,
     # amount of deceleration is also reduced. By the time the robot reaches the destination,
     # the speed expected to be same as the starting speed.
+    # The idea: Slope equation of a line (y = -mx + c)
     
     elif cdist >= 1-dxdist and cdist <= 1:
         drspeed = (tspeed-sspeed)/(-dxdist)*(cdist-(1-dxdist))+tspeed
@@ -133,12 +229,12 @@ def accDecDrive(total_dist, start_speed = 30, top_speed = 300, acc_dist=0.1, dec
             acc_dist = The distance from the starting posion, how far the acceleration is done
                     At the end of this distance, the cruising will start (no acceleration)
                     This is distance from start as % of total_distance
-            dec_dist = Deceleration distance. The disaance from the end how far deceleration shuld be one
+            dec_dist = Deceleration distance. The distance from the end how far deceleration should be one
                     This is given % of total_distance.
     """
     #Proportional factor for PID
     # I and D are not used.
-    kp = 2
+    kp = 1.0
 
     gyro.reset_angle(0)
     left_motor.reset_angle(0)
@@ -253,14 +349,28 @@ def get_menu_selection():
                 current_row += 1
             show_menu(current_row)
 
+def medium_right(angle):
+    right_medium_motor.run_angle(200,angle)
+
 def run1():
-    accDecDrive(total_dist=5.0, start_speed=30, top_speed = 300, acc_dist=0.2, dec_dist=0.2)
+    accDecDrive(total_dist=5.0, start_speed=30, top_speed = 300, acc_dist=0.3, dec_dist=0.3)
 
 def run2():
-    pass
+    right_medium_motor.run_angle(200,-50)
+    left_medium_motor.run_angle(200,-50)
 
 def run3():
-    pass
+    def medium_right():
+        right_medium_motor.run_angle(200,-50)
+
+    def medium_left():
+        left_medium_motor.run_angle(200,-50)
+
+    def call_accDecForTesting():
+        accDecDrive(5,30,300,0.3,0.3)
+
+    run_parallel (call_accDecForTesting, medium_left, medium_right)
+    
 
 #---------------------------------------  
 # Main program loop starts here
