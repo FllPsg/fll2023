@@ -349,27 +349,13 @@ def get_menu_selection():
                 current_row += 1
             show_menu(current_row)
 
-def medium_right(angle):
-    right_medium_motor.run_angle(200,angle)
 
 def run1():
-    accDecDrive(total_dist=5.0, start_speed=30, top_speed = 300, acc_dist=0.3, dec_dist=0.3)
-
+    
 def run2():
-    right_medium_motor.run_angle(200,-50)
-    left_medium_motor.run_angle(200,-50)
 
 def run3():
-    def medium_right():
-        right_medium_motor.run_angle(200,-50)
 
-    def medium_left():
-        left_medium_motor.run_angle(200,-50)
-
-    def call_accDecForTesting():
-        accDecDrive(5,30,300,0.3,0.3)
-
-    run_parallel (call_accDecForTesting, medium_left, medium_right)
     
 
 #---------------------------------------  
@@ -388,8 +374,7 @@ while True:
     elif key == 3:
         ev3.screen.print("Run 3")
         run3()
-    elif key == 4:
-        break
+
 
 
     
