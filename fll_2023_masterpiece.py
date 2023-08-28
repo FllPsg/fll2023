@@ -310,6 +310,15 @@ def gyrospinturn(angle,speed):
             right_motor.stop(Stop.BRAKE)
             break
 
+def simplemovestraight(distance_rotation, speed):
+    """ converting rotations into mm
+    1 wheel diameter = 56 mm
+    1 rotation = 56 * pi = 175.84 mm """
+    distance_mm = 175.84 * distance_rotation
+    robot.settings(straight_speed=speed)
+    robot.straight(distance_mm) 
+    robot.stop()
+
 def show_menu(row):
     ev3.screen.clear()
     if row == 1:
@@ -351,11 +360,33 @@ def get_menu_selection():
 
 
 def run1():
+
+    def resetleftmediummotor():
+        left_medium_motor.run_time(200,1500)
+
+    def resetrightmediummotor():
+        right_medium_motor.run_time(200,1500) 
+    
+    def movefrombase():
+        simplemovestraight(0.75,100)
+
+    def moveto3dexp():
+        accDecDrive(1.45, 30, 120)
+    
+    def movedown():
+        left_medium_motor.run_target(200,-75)
+    
+    run_parallel(resetleftmediummotor, resetrightmediummotor, movefrombase)
+    gyrospinturn(-105.5, 200)
+    run_parallel(moveto3dexp,movedown)
+    left_medium_motor.stop()
+    gyrospinturn(10,150)
+    
     
 def run2():
-
+    pass
 def run3():
-
+    pass
     
 
 #---------------------------------------  
