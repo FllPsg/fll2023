@@ -16,9 +16,7 @@ from pybricks.experimental import run_parallel
 
 NEED_LOGGING = False
 if NEED_LOGGING:
-    Stopwatch =StopWatch()
     data_log = DataLog('LogMessage')
-
     def LogMsg(msg):
         data_log.log(msg)
 else:
@@ -27,6 +25,9 @@ else:
 
 # Initialize the EV3 Brick.
 ev3 = EV3Brick()
+
+# Instantiate a timer
+robot_clock = StopWatch()
 
 # Instantiate the left large motor
 try:
@@ -219,7 +220,7 @@ def calc_var_acc_speed(cdist, axdist, dxdist, sspeed, tspeed):
     # return the computed speed
     return drspeed
 
-def accDecDrive(total_dist, start_speed = 30, top_speed = 300, acc_dist=0.1, dec_dist=0.1):
+def accDecDrive(total_dist, start_speed = 30, top_speed = 300, acc_dist=0.2, dec_dist=0.2):
     """ Acceleration/Deceleration Drive with variable acceleration
         Parameters:
             total_dist = The total target distance. Given in number of rotations.
@@ -297,6 +298,7 @@ def aligntoblack():
 def gyrospinturn(angle,speed):
     x=speed
     nx=-1*speed
+    abs_angle = abs(angle)
     gyro.reset_angle(0)
     if angle < 0:
         left_motor.run(nx)
@@ -305,10 +307,28 @@ def gyrospinturn(angle,speed):
         left_motor.run(x)
         right_motor.run(nx)
     while True:
-        if abs(gyro.angle()) >= abs(angle):
+        if abs(gyro.angle()) >= abs_angle:
             left_motor.stop(Stop.BRAKE)
             right_motor.stop(Stop.BRAKE)
             break
+
+def gyrospinturntime(angle, speed, time):
+    x=speed
+    nx=-1*speed
+    ctime = robot_clock.time()
+    abs_angle = abs(angle)
+    gyro.reset_angle(0)
+    if angle < 0:
+        left_motor.run(nx)
+        right_motor.run(x)
+    else:
+        left_motor.run(x)
+        right_motor.run(nx)
+    while True:
+        if (robot_clock.time() >= ctime+time) or (abs(gyro.angle()) >= abs_angle):
+            left_motor.stop(Stop.BRAKE)
+            right_motor.stop(Stop.BRAKE)
+            break    
 
 def simplemovestraight(distance_rotation, speed):
     """ converting rotations into mm
@@ -362,25 +382,35 @@ def get_menu_selection():
 def run1():
 
     def resetleftmediummotor():
-        left_medium_motor.run_time(200,1500)
+        left_medium_motor.run_time(350,1500)
 
     def resetrightmediummotor():
-        right_medium_motor.run_time(200,1500) 
+        right_medium_motor.run_time(350,1500) 
     
     def movefrombase():
-        simplemovestraight(0.75,100)
+        simplemovestraight(0.75,120)
 
     def moveto3dexp():
-        accDecDrive(1.45, 30, 120)
+        simplemovestraight(1.3,120)
     
-    def movedown():
-        left_medium_motor.run_target(200,-75)
+    def lamovedown():
+        left_medium_motor.run_target(200,-68)
+        left_medium_motor.hold()
     
+    # Mission: 3D Cenima
     run_parallel(resetleftmediummotor, resetrightmediummotor, movefrombase)
-    gyrospinturn(-105.5, 200)
-    run_parallel(moveto3dexp,movedown)
-    left_medium_motor.stop()
+    gyrospinturn(-100, 200)
+    run_parallel(moveto3dexp,lamovedown)
+    gyrospinturntime(-10, 150, 200)
+    simplemovestraight(.2,100)
     gyrospinturn(10,150)
+
+    # Mission: Audience Delivery - 1 (Destination: 3D Cenima)
+    simplemovestraight(.4,100)
+    simplemovestraight(-0.84, 120)
+
+    # Mission: Audience Deliver - 2 (Destination: Skateboard area)
+    gyrospinturn(19,150)
     
     
 def run2():
