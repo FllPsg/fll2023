@@ -307,7 +307,10 @@ def gyrospinturn(angle,speed):
         left_motor.run(x)
         right_motor.run(nx)
     while True:
-        if abs(gyro.angle()) >= abs_angle:
+        ga = gyro.angle()
+        ps = "Gyro Angle: "+str(ga)
+        ev3.screen.print(ps)
+        if abs(ga) >= abs_angle:
             left_motor.stop(Stop.BRAKE)
             right_motor.stop(Stop.BRAKE)
             break
@@ -391,26 +394,36 @@ def run1():
         simplemovestraight(0.75,120)
 
     def moveto3dexp():
-        simplemovestraight(1.3,120)
+        simplemovestraight(1.25,120)
     
-    def lamovedown():
-        left_medium_motor.run_target(200,-68)
+    def lamovedown_3dc():
+        left_medium_motor.run_target(200,-69)
         left_medium_motor.hold()
     
     # Mission: 3D Cenima
     run_parallel(resetleftmediummotor, resetrightmediummotor, movefrombase)
-    gyrospinturn(-100, 200)
-    run_parallel(moveto3dexp,lamovedown)
-    gyrospinturntime(-10, 150, 200)
-    simplemovestraight(.2,100)
+    gyrospinturn(-97, 200)
+    run_parallel(moveto3dexp,lamovedown_3dc)
+    gyrospinturn(-11, 150)
+    simplemovestraight(0.2,100)
     gyrospinturn(10,150)
 
     # Mission: Audience Delivery - 1 (Destination: 3D Cenima)
-    simplemovestraight(.4,100)
-    simplemovestraight(-0.84, 120)
+    def lamoveup_ad1():
+        left_medium_motor.run_time(350,1000)
+
+    def moveback_ad1():   
+        simplemovestraight(-0.6, 120)
+
+    simplemovestraight(0.5,100)
+    run_parallel(lamoveup_ad1, moveback_ad1)
 
     # Mission: Audience Deliver - 2 (Destination: Skateboard area)
-    gyrospinturn(19,150)
+    gyrospinturn(31, 150)
+   
+    #resetrightmediummotor()
+    accDecDrive(3.4,30,300,0.3,0.3)
+    
     
     
 def run2():
