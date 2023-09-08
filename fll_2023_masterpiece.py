@@ -394,11 +394,12 @@ def run1():
         simplemovestraight(0.75,120)
 
     def moveto3dexp():
-        simplemovestraight(1.25,120)
+        simplemovestraight(1.1,120)
     
     def lamovedown_3dc():
-        left_medium_motor.run_target(200,-69)
+        left_medium_motor.run_target(200,-68)
         left_medium_motor.hold()
+
     
     # Mission: 3D Cenima
     run_parallel(resetleftmediummotor, resetrightmediummotor, movefrombase)
@@ -407,23 +408,28 @@ def run1():
     gyrospinturn(-11, 150)
     simplemovestraight(0.2,100)
     gyrospinturn(10,150)
-
+    
     # Mission: Audience Delivery - 1 (Destination: 3D Cenima)
     def lamoveup_ad1():
         left_medium_motor.run_time(350,1000)
 
-    def moveback_ad1():   
-        simplemovestraight(-0.6, 120)
+    def movefwd_ad1():  
+        simplemovestraight(0.68,100)  
 
-    simplemovestraight(0.5,100)
-    run_parallel(lamoveup_ad1, moveback_ad1)
+    run_parallel(lamoveup_ad1, movefwd_ad1)
+    simplemovestraight(-0.6, 120)
+    
 
     # Mission: Audience Deliver - 2 (Destination: Skateboard area)
     gyrospinturn(31, 150)
-   
-    #resetrightmediummotor()
-    accDecDrive(3.4,30,300,0.3,0.3)
+    accDecDrive(3.3,30,300,0.3,0.3)
+    simplemovestraight(-0.5,100)
+    gyrospinturn(-70,100)
+    left_medium_motor.run_time(-350,1000) 
+      
     
+
+   
     
     
 def run2():
