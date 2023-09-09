@@ -385,10 +385,10 @@ def get_menu_selection():
 def run1():
 
     def resetleftmediummotor():
-        left_medium_motor.run_time(350,1500)
+        left_medium_motor.run_time(350,1500, Stop.BRAKE)
 
     def resetrightmediummotor():
-        right_medium_motor.run_time(350,1500) 
+        right_medium_motor.run_time(350,1500, Stop.BRAKE)
     
     def movefrombase():
         simplemovestraight(0.75,120)
@@ -397,38 +397,47 @@ def run1():
         simplemovestraight(1.1,120)
     
     def lamovedown_3dc():
-        left_medium_motor.run_target(200,-68)
-        left_medium_motor.hold()
+        left_medium_motor.run_target(200,-68, Stop.BRAKE)
 
-    
     # Mission: 3D Cenima
     run_parallel(resetleftmediummotor, resetrightmediummotor, movefrombase)
     gyrospinturn(-97, 200)
     run_parallel(moveto3dexp,lamovedown_3dc)
+    #Alight to model (3D cenima)
     gyrospinturn(-11, 150)
+    
     simplemovestraight(0.2,100)
+    # Rotate rigt to move dragon to complete 3D Cinema mission
     gyrospinturn(10,150)
     
     # Mission: Audience Delivery - 1 (Destination: 3D Cenima)
     def lamoveup_ad1():
-        left_medium_motor.run_time(350,1000)
+        left_medium_motor.run_time(350,1000, Stop.BRAKE)
 
     def movefwd_ad1():  
-        simplemovestraight(0.68,100)  
+        simplemovestraight(0.68,100) 
 
     run_parallel(lamoveup_ad1, movefwd_ad1)
     simplemovestraight(-0.6, 120)
     
-
-    # Mission: Audience Deliver - 2 (Destination: Skateboard area)
+    # Mission: Audience Delivery - 2 (Destination: Skateboard area)
     gyrospinturn(31, 150)
     accDecDrive(3.3,30,300,0.3,0.3)
     simplemovestraight(-0.5,100)
-    gyrospinturn(-70,100)
-    left_medium_motor.run_time(-350,1000) 
-      
-    
+    gyrospinturn(-71,100)
 
+    #Mission: Expert deliery - 1 (Stage Manager collection)
+    def ramovedowntostagemanager():
+        right_medium_motor.run_target(200, -68, Stop.BRAKE)
+
+    left_medium_motor.run_time(-300,1000, Stop.BRAKE)
+    gyrospinturn(-10, 150)
+    simplemovestraight(-0.43,100)
+    run_parallel(lamoveup_ad1, ramovedowntostagemanager)
+    simplemovestraight(0.5,100)
+    right_medium_motor.run_time(250, 1000, Stop.BRAKE)
+
+      
    
     
     
