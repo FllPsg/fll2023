@@ -137,6 +137,18 @@ except:
     wait(10000)
     exit
 
+def robot_stop(mode=1):
+    robot.stop()
+    if mode == 1: 
+        left_motor.brake()
+        right_motor.brake()
+    elif mode == 2:
+        left_motor.stop()
+        right_motor.stop()
+    elif mode == 3: 
+        left_motor.hold()
+        right_motor.hold()
+
 # Light value raw value to % mapping (for white (100%), blacn (0%) 45%, 55% and 50%)
 line = infile.readline()
 infile.close()
@@ -168,7 +180,7 @@ def gems2blackfwd(white_level,black_level, speed, port):
         while LeftColorSensor.reflection() >= black_level:
             gyro_error = 0-gyro.angle()
             robot.drive(speed, 3*gyro_error)
-        robot.stop(Stop.BRAKE)
+        robot_stop()
     if port == 4:
         white_level = (p4w - p4b)*white_level+p4b
         black_level = (p4w - p4b)*black_level+p4b
@@ -178,7 +190,7 @@ def gems2blackfwd(white_level,black_level, speed, port):
         while RightColorSensor.reflection() >= black_level:
             gyro_error = 0-gyro.angle()
             robot.drive(speed, 3*gyro_error)
-        robot.stop(Stop.BRAKE)
+        robot_stop()
 
 def calc_var_acc_speed(cdist, axdist, dxdist, sspeed, tspeed):
     """ Compute the speed based on current position of the robot
@@ -249,7 +261,7 @@ def accDecDrive(total_dist, start_speed = 30, top_speed = 300, acc_dist=0.2, dec
     while True:
         current_dist = abs(left_motor.angle())
         if current_dist >= total_dist:
-            robot.stop(Stop.BRAKE)
+            robot_stop()
             break
         else:
             drive_speed = calc_var_acc_speed(current_dist/total_dist, acc_dist, dec_dist, start_speed, top_speed)
@@ -267,7 +279,7 @@ def gems(rotations,speed):
     while True:
         ev3.screen.print("Checking gyro")
         if abs(left_motor.angle())>=target_deg:
-            robot.stop(Stop.BRAKE)
+            robot_stop()
             break
         else:
             gyro_error = 0-(gyro.angle())
@@ -291,7 +303,7 @@ def aligntoblack():
         if LeftColorSensor.reflection() > p1_45 and LeftColorSensor.reflection() < p1_55:
             if RightColorSensor.reflection() > p4_45 and RightColorSensor.reflection() < p4_55:
                 BeamDone = 1
-    robot.stop()
+    robot_stop()
     s = str(LeftColorSensor.reflection()) + " " + str(RightColorSensor.reflection())
     ev3.screen.print(s)
 
@@ -308,11 +320,9 @@ def gyrospinturn(angle,speed):
         right_motor.run(nx)
     while True:
         ga = gyro.angle()
-        ps = "Gyro Angle: "+str(ga)
-        ev3.screen.print(ps)
         if abs(ga) >= abs_angle:
-            left_motor.stop(Stop.BRAKE)
-            right_motor.stop(Stop.BRAKE)
+            left_motor.brake()
+            right_motor.brake()
             break
 
 def gyrospinturntime(angle, speed, time):
@@ -329,8 +339,8 @@ def gyrospinturntime(angle, speed, time):
         right_motor.run(nx)
     while True:
         if (robot_clock.time() >= ctime+time) or (abs(gyro.angle()) >= abs_angle):
-            left_motor.stop(Stop.BRAKE)
-            right_motor.stop(Stop.BRAKE)
+            left_motor.brake()
+            right_motor.brake()
             break    
 
 def simplemovestraight(distance_rotation, speed):
@@ -340,22 +350,22 @@ def simplemovestraight(distance_rotation, speed):
     distance_mm = 175.84 * distance_rotation
     robot.settings(straight_speed=speed)
     robot.straight(distance_mm) 
-    robot.stop()
+    robot_stop()
 
 def show_menu(row):
     ev3.screen.clear()
     if row == 1:
-        ev3.screen.print("Run 1 ***")
+        ev3.screen.print("Run 1.pink ***")
+        ev3.screen.print("Run 1.orange")
         ev3.screen.print("Run 2")
-        ev3.screen.print("Run 3")
     elif row == 2:
-        ev3.screen.print("Run 1")
-        ev3.screen.print("Run 2 ***")
-        ev3.screen.print("Run 3")
-    elif row == 3:
-        ev3.screen.print("Run 1")
+        ev3.screen.print("Run 1.pink")
+        ev3.screen.print("Run 1.orange ***")
         ev3.screen.print("Run 2")
-        ev3.screen.print("Run 3 ***")
+    elif row == 3:
+        ev3.screen.print("Run 1.pink")
+        ev3.screen.print("Run 1.orange")
+        ev3.screen.print("Run 2 ***")
 
 def get_menu_selection():
     global current_row
@@ -382,13 +392,15 @@ def get_menu_selection():
             show_menu(current_row)
 
 
-def run1():
+def run1(color=1):
 
     def resetleftmediummotor():
-        left_medium_motor.run_time(350,1500, Stop.BRAKE)
+        left_medium_motor.reset_angle(0)
+        left_medium_motor.run_time(350,1500, Stop.BRAKE, False)
 
     def resetrightmediummotor():
-        right_medium_motor.run_time(350,1500, Stop.BRAKE)
+        right_medium_motor.reset_angle(0)
+        right_medium_motor.run_time(350,1500, Stop.BRAKE, False)
     
     def movefrombase():
         simplemovestraight(0.75,120)
@@ -397,49 +409,68 @@ def run1():
         simplemovestraight(1.1,120)
     
     def lamovedown_3dc():
-        left_medium_motor.run_target(200,-68, Stop.BRAKE)
+        left_medium_motor.reset_angle(0)
+        left_medium_motor.run_target(200,-67, Stop.BRAKE)
 
     # Mission: 3D Cenima
     run_parallel(resetleftmediummotor, resetrightmediummotor, movefrombase)
-    gyrospinturn(-97, 200)
+    gyrospinturn(-100, 200)
     run_parallel(moveto3dexp,lamovedown_3dc)
     #Alight to model (3D cenima)
     gyrospinturn(-11, 150)
     
     simplemovestraight(0.2,100)
-    # Rotate rigt to move dragon to complete 3D Cinema mission
-    gyrospinturn(10,150)
-    
+    # Rotate rigt to ove dragon to complete 3D Cinema mission
+    gyrospinturn(8,150)
+
     # Mission: Audience Delivery - 1 (Destination: 3D Cenima)
     def lamoveup_ad1():
-        left_medium_motor.run_time(350,1000, Stop.BRAKE)
+        left_medium_motor.reset_angle(0)
+        left_medium_motor.run_time(350,1000, Stop.BRAKE, False)
 
     def movefwd_ad1():  
-        simplemovestraight(0.68,100) 
+        simplemovestraight(0.6,100) 
 
     run_parallel(lamoveup_ad1, movefwd_ad1)
     simplemovestraight(-0.6, 120)
     
     # Mission: Audience Delivery - 2 (Destination: Skateboard area)
-    gyrospinturn(31, 150)
+    gyrospinturn(36, 150)
     accDecDrive(3.3,30,300,0.3,0.3)
     simplemovestraight(-0.5,100)
-    gyrospinturn(-71,100)
+    gyrospinturn(-72,100)
 
     #Mission: Expert deliery - 1 (Stage Manager collection)
     def ramovedowntostagemanager():
-        right_medium_motor.run_target(200, -68, Stop.BRAKE)
+        right_medium_motor.reset_angle(0)
+        right_medium_motor.run_target(200, -70, Stop.BRAKE, False)
 
-    left_medium_motor.run_time(-300,1000, Stop.BRAKE)
+    left_medium_motor.reset_angle(0)
+    left_medium_motor.run_time(-300,500, Stop.BRAKE)
     gyrospinturn(-10, 150)
-    simplemovestraight(-0.43,100)
+    simplemovestraight(-0.5,100)
     run_parallel(lamoveup_ad1, ramovedowntostagemanager)
-    simplemovestraight(0.5,100)
-    right_medium_motor.run_time(250, 1000, Stop.BRAKE)
+    simplemovestraight(0.75,100)
 
-      
-   
-    
+    def liftstagemanager():
+        right_medium_motor.reset_angle(0)
+        right_medium_motor.run_time(150, 1000, Stop.BRAKE, False)
+
+    def spintoscenechange():
+        gyrospinturn(0.25,100)
+
+    # Mission Theater Scene Change
+    run_parallel(liftstagemanager,spintoscenechange)
+
+    simplemovestraight(0.43,100)
+    simplemovestraight(-0.43,100)
+    # If Orange color, change scene one more time 
+    if color == 2: 
+        simplemovestraight(0.43,100)
+        simplemovestraight(-0.43,100)
+
+    # Mission Virtual Reality 
+    gyrospinturn(50, 200)  
     
 def run2():
     pass
@@ -455,13 +486,13 @@ while True:
     key = get_menu_selection()
     ev3.screen.clear()
     if key == 1:
-        ev3.screen.print("Run 1")
-        run1()
+        ev3.screen.print("Run 1.pink")
+        run1(1)
     elif key == 2:
-        ev3.screen.print("Run 2")
-        run2()
+        ev3.screen.print("Run 1.orange")
+        run1(2)
     elif key == 3:
-        ev3.screen.print("Run 3")
+        ev3.screen.print("Run 2")
         run3()
 
 
