@@ -416,12 +416,12 @@ def run1(color=1):
     run_parallel(resetleftmediummotor, resetrightmediummotor, movefrombase)
     gyrospinturn(-100, 200)
     run_parallel(moveto3dexp,lamovedown_3dc)
-    #Alight to model (3D cenima)
+    #Align to model (3D cenima)
     gyrospinturn(-11, 150)
     
     simplemovestraight(0.2,100)
     # Rotate rigt to ove dragon to complete 3D Cinema mission
-    gyrospinturn(8,150)
+    gyrospinturn(9,150)
 
     # Mission: Audience Delivery - 1 (Destination: 3D Cenima)
     def lamoveup_ad1():
@@ -436,9 +436,13 @@ def run1(color=1):
     
     # Mission: Audience Delivery - 2 (Destination: Skateboard area)
     gyrospinturn(36, 150)
+    # Move towards teh skateboard area (the audience id moved to the skateboard area)
     accDecDrive(3.3,30,300,0.3,0.3)
+    # Move backward slightly to clear way for the audience to be delivered in the next step
     simplemovestraight(-0.5,100)
-    gyrospinturn(-72,100)
+    # Rotate left to deliver the audience at the same align the left arm correctly towards the 
+    # Stage manager loop
+    gyrospinturn(-73,100)
 
     #Mission: Expert deliery - 1 (Stage Manager collection)
     def ramovedowntostagemanager():
@@ -467,11 +471,27 @@ def run1(color=1):
     # If Orange color, change scene one more time 
     if color == 2: 
         simplemovestraight(0.43,100)
-        simplemovestraight(-0.43,100)
+        simplemovestraight(-0.5,100)
 
     # Mission Virtual Reality 
-    gyrospinturn(50, 200)  
-    
+    gyrospinturn(65, 200)
+    # Move backward little bit so that when we rotate towards VR, the audience 
+    # in the skateboard area is not disturbed.  
+    simplemovestraight(-0.5,100)
+    # Turn to align to the mission
+    gyrospinturn(57,200)
+    #Move forward to the mission VR
+    accDecDrive(1,30,250,0.3,0.3)
+    # Lower the left arm fast till it touches the orange lever
+    left_medium_motor.reset_angle(0)
+    left_medium_motor.run_target(350,-90, Stop.BRAKE, True)
+    # We rotate slightly right to align to orange lever
+    gyrospinturn(3,100)
+    # Lower the left arm again fast so that the entire force is used to lower the lever
+    left_medium_motor.run_time(-350,1500, Stop.BRAKE, True)
+    # Raise the left arm to complete the mission.
+    left_medium_motor.run_time(350,1000, Stop.BRAKE, True)
+
 def run2():
     pass
 def run3():
