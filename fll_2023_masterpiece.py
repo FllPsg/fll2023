@@ -420,9 +420,9 @@ def run1(color=1):
     gyrospinturn(-11, 150)
     
     simplemovestraight(0.2,100)
-    # Rotate rigt to ove dragon to complete 3D Cinema mission
+    # Rotate right to over dragon to complete 3D Cinema mission
     gyrospinturn(9,150)
-
+    
     # Mission: Audience Delivery - 1 (Destination: 3D Cenima)
     def lamoveup_ad1():
         left_medium_motor.reset_angle(0)
@@ -442,18 +442,20 @@ def run1(color=1):
     simplemovestraight(-0.5,100)
     # Rotate left to deliver the audience at the same align the left arm correctly towards the 
     # Stage manager loop
-    gyrospinturn(-73,100)
+    gyrospinturn(-70,200)
 
-    #Mission: Expert deliery - 1 (Stage Manager collection)
+    #Mission: Expert delivery - 1 (Stage Manager collection)
     def ramovedowntostagemanager():
         right_medium_motor.reset_angle(0)
         right_medium_motor.run_target(200, -70, Stop.BRAKE, False)
 
     left_medium_motor.reset_angle(0)
     left_medium_motor.run_time(-300,500, Stop.BRAKE)
+    # Align to Theater scene change model
     gyrospinturn(-10, 150)
     simplemovestraight(-0.5,100)
     run_parallel(lamoveup_ad1, ramovedowntostagemanager)
+    # Pick up stage manager 
     simplemovestraight(0.75,100)
 
     def liftstagemanager():
@@ -491,6 +493,20 @@ def run1(color=1):
     left_medium_motor.run_time(-350,1500, Stop.BRAKE, True)
     # Raise the left arm to complete the mission.
     left_medium_motor.run_time(350,1000, Stop.BRAKE, True)
+
+    # Mission Expert Delivery - 2 (Collecting Sound Engineer)
+    #align robot at sound mixer
+    gyrospinturn(21,200)
+    simplemovestraight(0.5,150)
+    gyrospinturn(62,200) 
+    simplemovestraight(-0.1,150)
+    right_medium_motor.run_time(-200,375, Stop.BRAKE, True) 
+    # Align Robot
+    gyrospinturn(17,150)
+    gyrospinturn(-1,150)
+    simplemovestraight(0.25,100) 
+    # Pick up Sound engineer
+    right_medium_motor.run_time(150,500, Stop.BRAKE, True) 
 
 def run2():
     pass
