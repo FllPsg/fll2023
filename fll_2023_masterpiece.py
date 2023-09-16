@@ -421,7 +421,7 @@ def run1(color=1):
     
     simplemovestraight(0.2,100)
     # Rotate right to over dragon to complete 3D Cinema mission
-    gyrospinturn(9,150)
+    gyrospinturn(11,150)
     
     # Mission: Audience Delivery - 1 (Destination: 3D Cenima)
     def lamoveup_ad1():
@@ -442,7 +442,7 @@ def run1(color=1):
     simplemovestraight(-0.5,100)
     # Rotate left to deliver the audience at the same align the left arm correctly towards the 
     # Stage manager loop
-    gyrospinturn(-70,200)
+    gyrospinturn(-68,200)
 
     #Mission: Expert delivery - 1 (Stage Manager collection)
     def ramovedowntostagemanager():
@@ -468,45 +468,45 @@ def run1(color=1):
     # Mission Theater Scene Change
     run_parallel(liftstagemanager,spintoscenechange)
 
-    simplemovestraight(0.43,100)
-    simplemovestraight(-0.43,100)
+    simplemovestraight(0.45,100)
+    simplemovestraight(-0.45,100)
     # If Orange color, change scene one more time 
     if color == 2: 
-        simplemovestraight(0.43,100)
-        simplemovestraight(-0.5,100)
+        simplemovestraight(0.46,100)
+        simplemovestraight(-0.53,100)
 
     # Mission Virtual Reality 
-    gyrospinturn(65, 200)
+    gyrospinturn(67, 200)
     # Move backward little bit so that when we rotate towards VR, the audience 
     # in the skateboard area is not disturbed.  
     simplemovestraight(-0.5,100)
     # Turn to align to the mission
     gyrospinturn(57,200)
     #Move forward to the mission VR
-    accDecDrive(1,30,250,0.3,0.3)
+    accDecDrive(1.05,30,250,0.3,0.3)
     # Lower the left arm fast till it touches the orange lever
     left_medium_motor.reset_angle(0)
     left_medium_motor.run_target(350,-90, Stop.BRAKE, True)
     # We rotate slightly right to align to orange lever
-    gyrospinturn(3,100)
+    gyrospinturn(1,50)
     # Lower the left arm again fast so that the entire force is used to lower the lever
     left_medium_motor.run_time(-350,1500, Stop.BRAKE, True)
     # Raise the left arm to complete the mission.
     left_medium_motor.run_time(350,1000, Stop.BRAKE, True)
 
-    # Mission Expert Delivery - 2 (Collecting Sound Engineer)
+    """# Mission Expert Delivery - 2 (Collecting Sound Engineer)
     #align robot at sound mixer
     gyrospinturn(21,200)
     simplemovestraight(0.5,150)
     gyrospinturn(62,200) 
-    simplemovestraight(-0.1,150)
+    simplemovestraight(-0.15,150)
     right_medium_motor.run_time(-200,375, Stop.BRAKE, True) 
-    # Align Robot
-    gyrospinturn(17,150)
-    gyrospinturn(-1,150)
+    # A lign Robot
+    gyrospinturn(18,150)
+    gyrospinturn(-5,150)
     simplemovestraight(0.25,100) 
     # Pick up Sound engineer
-    right_medium_motor.run_time(150,500, Stop.BRAKE, True) 
+    right_medium_motor.run_time(150,500, Stop.BRAKE, True) """
 
 def run2():
     pass
@@ -524,6 +524,7 @@ while True:
     if key == 1:
         ev3.screen.print("Run 1.pink")
         run1(1)
+        robot_stop(2)
     elif key == 2:
         ev3.screen.print("Run 1.orange")
         run1(2)
