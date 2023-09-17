@@ -325,6 +325,31 @@ def gyrospinturn(angle,speed):
             right_motor.brake()
             break
 
+def aligntophy(angle,speed):
+    x=speed
+    nx=-1*speed
+    abs_angle = abs(angle)
+    gyro.reset_angle(0)
+    # Initialize previous absolute gyro angle
+    p_abs_ga = 0
+    if angle < 0:
+        left_motor.run(nx)
+        right_motor.run(x)
+    else:
+        left_motor.run(x)
+        right_motor.run(nx)
+    while True:
+        wait(100)
+        abs_ga = abs(gyro.angle())
+        if (abs_ga >= abs_angle) or (abs(p_abs_ga - abs_ga) < 1):
+            # Stop rotating if the target angle is reached or there is no change in rotation
+            # If the angular change is less 1, we consider that there is no rotation
+            left_motor.brake()
+            right_motor.brake()
+            break
+        # Store the current absolulte gyro angle to previous absolute gyro angle
+        p_abs_ga = abs_ga
+
 def gyrospinturntime(angle, speed, time):
     x=speed
     nx=-1*speed
@@ -421,7 +446,7 @@ def run1(color=1):
     
     simplemovestraight(0.2,100)
     # Rotate right to over dragon to complete 3D Cinema mission
-    gyrospinturn(11,150)
+    gyrospinturn(10,150)
     
     # Mission: Audience Delivery - 1 (Destination: 3D Cenima)
     def lamoveup_ad1():
@@ -436,18 +461,18 @@ def run1(color=1):
     
     # Mission: Audience Delivery - 2 (Destination: Skateboard area)
     gyrospinturn(36, 150)
-    # Move towards teh skateboard area (the audience id moved to the skateboard area)
+    # Move towards the skateboard area (the audience id moved to the skateboard area)
     accDecDrive(3.3,30,300,0.3,0.3)
     # Move backward slightly to clear way for the audience to be delivered in the next step
     simplemovestraight(-0.5,100)
     # Rotate left to deliver the audience at the same align the left arm correctly towards the 
     # Stage manager loop
-    gyrospinturn(-68,200)
+    gyrospinturn(-70,150)
 
     #Mission: Expert delivery - 1 (Stage Manager collection)
     def ramovedowntostagemanager():
         right_medium_motor.reset_angle(0)
-        right_medium_motor.run_target(200, -70, Stop.BRAKE, False)
+        right_medium_motor.run_target(200, -71, Stop.BRAKE, False)
 
     left_medium_motor.reset_angle(0)
     left_medium_motor.run_time(-300,500, Stop.BRAKE)
@@ -463,17 +488,17 @@ def run1(color=1):
         right_medium_motor.run_time(150, 1000, Stop.BRAKE, False)
 
     def spintoscenechange():
-        gyrospinturn(0.25,100)
+        gyrospinturn(4.5,100)
 
     # Mission Theater Scene Change
     run_parallel(liftstagemanager,spintoscenechange)
 
-    simplemovestraight(0.45,100)
-    simplemovestraight(-0.45,100)
+    simplemovestraight(0.46,100)
+    simplemovestraight(-0.46,100)
     # If Orange color, change scene one more time 
     if color == 2: 
-        simplemovestraight(0.46,100)
-        simplemovestraight(-0.53,100)
+        simplemovestraight(0.47,100)
+        simplemovestraight(-0.54,100)
 
     # Mission Virtual Reality 
     gyrospinturn(67, 200)
@@ -481,7 +506,7 @@ def run1(color=1):
     # in the skateboard area is not disturbed.  
     simplemovestraight(-0.5,100)
     # Turn to align to the mission
-    gyrospinturn(57,200)
+    gyrospinturn(54,200)
     #Move forward to the mission VR
     accDecDrive(1.05,30,250,0.3,0.3)
     # Lower the left arm fast till it touches the orange lever
@@ -494,19 +519,19 @@ def run1(color=1):
     # Raise the left arm to complete the mission.
     left_medium_motor.run_time(350,1000, Stop.BRAKE, True)
 
-    """# Mission Expert Delivery - 2 (Collecting Sound Engineer)
+    # Mission Expert Delivery - 2 (Collecting Sound Engineer)
     #align robot at sound mixer
-    gyrospinturn(21,200)
+    """gyrospinturn(21,200)
     simplemovestraight(0.5,150)
     gyrospinturn(62,200) 
     simplemovestraight(-0.15,150)
     right_medium_motor.run_time(-200,375, Stop.BRAKE, True) 
-    # A lign Robot
+    # Align Robot
     gyrospinturn(18,150)
     gyrospinturn(-5,150)
     simplemovestraight(0.25,100) 
     # Pick up Sound engineer
-    right_medium_motor.run_time(150,500, Stop.BRAKE, True) """
+    right_medium_motor.run_time(150,500, Stop.BRAKE, True)""" 
 
 def run2():
     pass
