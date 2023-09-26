@@ -339,9 +339,12 @@ def aligntophy(angle,speed):
         left_motor.run(x)
         right_motor.run(nx)
     while True:
-        wait(100)
+        wait(150)
         abs_ga = abs(gyro.angle())
-        if (abs_ga >= abs_angle) or (abs(p_abs_ga - abs_ga) < 1):
+        turn_diff = abs(p_abs_ga - abs_ga)
+        LogMsg("Turn Chg {} {} {}".format(p_abs_ga, abs_ga, turn_diff))
+        ev3.screen.print("Turn Chg {}".format(turn_diff))
+        if (abs_ga >= abs_angle) or turn_diff < 5:
             # Stop rotating if the target angle is reached or there is no change in rotation
             # If the angular change is less 1, we consider that there is no rotation
             left_motor.brake()
@@ -418,7 +421,7 @@ def get_menu_selection():
 
 
 def run1(color=1):
-
+    
     def resetleftmediummotor():
         left_medium_motor.reset_angle(0)
         left_medium_motor.run_time(350,1500, Stop.BRAKE, False)
@@ -435,7 +438,7 @@ def run1(color=1):
     
     def lamovedown_3dc():
         left_medium_motor.reset_angle(0)
-        left_medium_motor.run_target(200,-67, Stop.BRAKE)
+        left_medium_motor.run_target(200,-68, Stop.BRAKE)
 
     # Mission: 3D Cenima
     run_parallel(resetleftmediummotor, resetrightmediummotor, movefrombase)
@@ -472,27 +475,29 @@ def run1(color=1):
     #Mission: Expert delivery - 1 (Stage Manager collection)
     def ramovedowntostagemanager():
         right_medium_motor.reset_angle(0)
-        right_medium_motor.run_target(200, -71, Stop.BRAKE, False)
+        right_medium_motor.run_target(200, -74, Stop.BRAKE, False)
 
     left_medium_motor.reset_angle(0)
-    left_medium_motor.run_time(-300,500, Stop.BRAKE)
+    left_medium_motor.run_time(-250,600, Stop.BRAKE)
     # Align to Theater scene change model
-    gyrospinturn(-10, 150)
+    gyrospinturn(-11, 150)
     simplemovestraight(-0.5,100)
+    # Raise left arm up and lower the right arm simultaneously
     run_parallel(lamoveup_ad1, ramovedowntostagemanager)
-    # Pick up stage manager 
+    # Mover forward into the loop of stage manager  
     simplemovestraight(0.75,100)
-
+    
     def liftstagemanager():
         right_medium_motor.reset_angle(0)
         right_medium_motor.run_time(150, 1000, Stop.BRAKE, False)
 
     def spintoscenechange():
-        gyrospinturn(4.5,100)
+        # rotate a little to position lance at the center of the orange lever
+        gyrospinturn(6,100)
 
     # Mission Theater Scene Change
     run_parallel(liftstagemanager,spintoscenechange)
-
+    
     simplemovestraight(0.46,100)
     simplemovestraight(-0.46,100)
     # If Orange color, change scene one more time 
@@ -506,7 +511,7 @@ def run1(color=1):
     # in the skateboard area is not disturbed.  
     simplemovestraight(-0.5,100)
     # Turn to align to the mission
-    gyrospinturn(54,200)
+    gyrospinturn(50,200)
     #Move forward to the mission VR
     accDecDrive(1.05,30,250,0.3,0.3)
     # Lower the left arm fast till it touches the orange lever
@@ -520,23 +525,42 @@ def run1(color=1):
     left_medium_motor.run_time(350,1000, Stop.BRAKE, True)
 
     # Mission Expert Delivery - 2 (Collecting Sound Engineer)
-    #align robot at sound mixer
-    """gyrospinturn(21,200)
-    simplemovestraight(0.5,150)
-    gyrospinturn(62,200) 
-    simplemovestraight(-0.15,150)
-    right_medium_motor.run_time(-200,375, Stop.BRAKE, True) 
-    # Align Robot
-    gyrospinturn(18,150)
-    gyrospinturn(-5,150)
-    simplemovestraight(0.25,100) 
-    # Pick up Sound engineer
-    right_medium_motor.run_time(150,500, Stop.BRAKE, True)""" 
+    # Turn away from Virtual Reality 
+    gyrospinturn(25,200)
+    # Move towards Sound Mixer
+    simplemovestraight(0.45,150)
+    # Rotate towards sound mixer
+    gyrospinturn(63,200) 
+    # Move bacwards little bit so that when right arm is brought down it will not
+    # disturb the sound engineer
+    simplemovestraight(-0.25, 150)
+   
+    # Bring the right arm dowm to prepare to pickup sound engineer 
+    right_medium_motor.reset_angle(0)
+    right_medium_motor.run_target(150,-74, Stop.BRAKE)
+
+    # Rotate right to alighn the arm with sound engineer loop
+    gyrospinturn(7,150)
+
+    # Move forward into the loop of the sound engineer   
+    simplemovestraight(0.4, 100)
+
+    #pick up sound engineer
+    right_medium_motor.reset_angle(0)
+    right_medium_motor.run_target(100, 65, Stop.BRAKE)
+       
+    #Mission: Immersive Experience Model
+    simplemovestraight(-0.1,80)
+    gyrospinturn(-57.5, 200)
+
+    accDecDrive(2.3, 30, 300, 0.2, 0.2)
+    left_medium_motor.run_time(-300, 500)
+
+
+    
 
 def run2():
-    pass
-def run3():
-    pass
+    aligntophy(-30, 150)
     
 
 #---------------------------------------  
@@ -555,7 +579,8 @@ while True:
         run1(2)
     elif key == 3:
         ev3.screen.print("Run 2")
-        run3()
+        run2()
+        wait(3000)
 
 
 
