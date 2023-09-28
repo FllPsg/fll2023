@@ -26,14 +26,15 @@ while True:
     try:
         gyro = GyroSensor(Port.S2, Direction.CLOCKWISE)
         gyro.reset_angle(0)
+        read_count = 0
         while True:
             button_pressed = ev3.buttons.pressed()
             if Button.CENTER in button_pressed:
                 break
             try:
                 gyro_ang = gyro.angle()
-                s = "Angle: " + str(gyro_ang)
-                ev3.screen.print(s)
+                read_count = read_count + 1
+                ev3.screen.print("{}. Angle: {}".format(read_count, gyro_ang))
             except OSError as ex:
                 # OSError was raised, check for the kind of error
                 # If no device error (ENODEV), notify on the console

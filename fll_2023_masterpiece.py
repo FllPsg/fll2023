@@ -1,17 +1,14 @@
 #!/usr/bin/env pybricks-micropython
 
-from pybricks.hubs import EV3Brick
-from pybricks.parameters import Port
-from pybricks.parameters import Button
-from pybricks.ev3devices import GyroSensor 
-from pybricks.parameters import Direction
-from pybricks.ev3devices import Motor
-from pybricks.robotics import DriveBase
-from pybricks.parameters import Stop
-from pybricks.ev3devices import ColorSensor
-from pybricks.tools import wait, DataLog, StopWatch
 import io
 import uerrno
+from pybricks.hubs import EV3Brick
+from pybricks.parameters import Port, Button, Direction, Stop, Color
+from pybricks.ev3devices import GyroSensor, Motor 
+from pybricks.robotics import DriveBase
+from pybricks.ev3devices import ColorSensor
+from pybricks.iodevices import Ev3devSensor
+from pybricks.tools import wait, DataLog, StopWatch
 from pybricks.experimental import run_parallel
 
 NEED_LOGGING = False
@@ -129,6 +126,8 @@ except OSError as ex:
 # Instantiate the drive base.
 robot = DriveBase(left_motor, right_motor, wheel_diameter=56, axle_track=120)
 
+# Light reading value normalization to 0-100%
+# Light value raw value to % mapping (for white (100%), blacn (0%) 45%, 55% and 50%)
 try:
     infile = io.open("lval.txt",'r')
 except:
@@ -137,19 +136,6 @@ except:
     wait(10000)
     exit
 
-def robot_stop(mode=1):
-    robot.stop()
-    if mode == 1: 
-        left_motor.brake()
-        right_motor.brake()
-    elif mode == 2:
-        left_motor.stop()
-        right_motor.stop()
-    elif mode == 3: 
-        left_motor.hold()
-        right_motor.hold()
-
-# Light value raw value to % mapping (for white (100%), blacn (0%) 45%, 55% and 50%)
 line = infile.readline()
 infile.close()
 lvals = line.split(' ')
@@ -165,6 +151,60 @@ p1_50 = (p1w - p1b)*0.50+p1b
 p4_45 = (p4w - p4b)*0.45+p4b
 p4_55 = (p4w - p4b)*0.55+p4b
 p4_50 = (p4w - p4b)*0.50+p4b
+
+def gyro_soft_calib():
+    """ Gyro sensor run time calibration by mode switching ("GYRO-CAL" --> "GYRO-ANG")
+    """
+    print("robot: gyro_calib")
+    ev3.light.on(Color.RED)
+    wait(200)
+    calib_gyro = Ev3devSensor(Port.S2)
+
+    for i in range(3):
+        calib_gyro.read("GYRO-CAL")
+        wait(200)
+        angle = int(calib_gyro.read("GYRO-ANG")[0]) 
+        if angle == 0:
+            print("gyro calib done!", i)
+            break
+    wait(200)
+    gyro.reset_angle(0)
+    ev3.speaker.beep()
+    ev3.light.on(Color.GREEN)
+
+def robot_stop(mode=1):
+    robot.stop()
+    if mode == 1: 
+        left_motor.brake()
+        right_motor.brake()
+    elif mode == 2:
+        left_motor.stop()
+        right_motor.stop()
+    elif mode == 3: 
+        left_motor.hold()
+        right_motor.hold()
+
+def gyro_read_angle():
+    read_count = 0
+    while True:
+        button_pressed = ev3.buttons.pressed()
+        if Button.CENTER in button_pressed:
+            break
+        try:
+            gyro_ang = gyro.angle()
+            read_count = read_count + 1
+            ev3.screen.print("{}. Angle: {}".format(read_count, gyro_ang))
+        except OSError as ex:
+            # OSError was raised, check for the kind of error
+            # If no device error (ENODEV), notify on the console
+            if ex.args[0] == uerrno.ENODEV:
+                # ENODEV is short for "Error, no device."
+                ev3.screen.print("Gyro: No device!")
+            else:
+                ev3.screen.print("Gyro: OSError {}".format(ex.args[0]))
+
+            # Break to re-instantiate device again
+            break 
 
 def gems2blackfwd(white_level,black_level, speed, port):
     gyro.reset_angle(0)
@@ -232,7 +272,7 @@ def calc_var_acc_speed(cdist, axdist, dxdist, sspeed, tspeed):
     # return the computed speed
     return drspeed
 
-def accDecDrive(total_dist, start_speed = 30, top_speed = 300, acc_dist=0.2, dec_dist=0.2):
+def accDecGems(total_dist, start_speed = 30, top_speed = 300, acc_dist=0.2, dec_dist=0.2):
     """ Acceleration/Deceleration Drive with variable acceleration
         Parameters:
             total_dist = The total target distance. Given in number of rotations.
@@ -290,7 +330,6 @@ def gems(rotations,speed):
 
 def aligntoblack():
     BeamDone = 0
-
     while not BeamDone == 1:
         if LeftColorSensor.reflection() > p1_50:
             left_motor.run(50)
@@ -304,8 +343,6 @@ def aligntoblack():
             if RightColorSensor.reflection() > p4_45 and RightColorSensor.reflection() < p4_55:
                 BeamDone = 1
     robot_stop()
-    s = str(LeftColorSensor.reflection()) + " " + str(RightColorSensor.reflection())
-    ev3.screen.print(s)
 
 def gyrospinturn(angle,speed):
     x=speed
@@ -321,55 +358,8 @@ def gyrospinturn(angle,speed):
     while True:
         ga = gyro.angle()
         if abs(ga) >= abs_angle:
-            left_motor.brake()
-            right_motor.brake()
+            robot_stop()
             break
-
-def aligntophy(angle,speed):
-    x=speed
-    nx=-1*speed
-    abs_angle = abs(angle)
-    gyro.reset_angle(0)
-    # Initialize previous absolute gyro angle
-    p_abs_ga = 0
-    if angle < 0:
-        left_motor.run(nx)
-        right_motor.run(x)
-    else:
-        left_motor.run(x)
-        right_motor.run(nx)
-    while True:
-        wait(150)
-        abs_ga = abs(gyro.angle())
-        turn_diff = abs(p_abs_ga - abs_ga)
-        LogMsg("Turn Chg {} {} {}".format(p_abs_ga, abs_ga, turn_diff))
-        ev3.screen.print("Turn Chg {}".format(turn_diff))
-        if (abs_ga >= abs_angle) or turn_diff < 5:
-            # Stop rotating if the target angle is reached or there is no change in rotation
-            # If the angular change is less 1, we consider that there is no rotation
-            left_motor.brake()
-            right_motor.brake()
-            break
-        # Store the current absolulte gyro angle to previous absolute gyro angle
-        p_abs_ga = abs_ga
-
-def gyrospinturntime(angle, speed, time):
-    x=speed
-    nx=-1*speed
-    ctime = robot_clock.time()
-    abs_angle = abs(angle)
-    gyro.reset_angle(0)
-    if angle < 0:
-        left_motor.run(nx)
-        right_motor.run(x)
-    else:
-        left_motor.run(x)
-        right_motor.run(nx)
-    while True:
-        if (robot_clock.time() >= ctime+time) or (abs(gyro.angle()) >= abs_angle):
-            left_motor.brake()
-            right_motor.brake()
-            break    
 
 def simplemovestraight(distance_rotation, speed):
     """ converting rotations into mm
@@ -440,16 +430,21 @@ def run1(color=1):
         left_medium_motor.reset_angle(0)
         left_medium_motor.run_target(200,-68, Stop.BRAKE)
 
+    #Initialize devices initial positions
+    gyro_soft_calib()
+    left_medium_motor.stop()
+    right_medium_motor.stop()
+
     # Mission: 3D Cenima
     run_parallel(resetleftmediummotor, resetrightmediummotor, movefrombase)
     gyrospinturn(-100, 200)
     run_parallel(moveto3dexp,lamovedown_3dc)
     #Align to model (3D cenima)
-    gyrospinturn(-11, 150)
+    gyrospinturn(-4, 150)
     
     simplemovestraight(0.2,100)
     # Rotate right to over dragon to complete 3D Cinema mission
-    gyrospinturn(10,150)
+    gyrospinturn(5,150)
     
     # Mission: Audience Delivery - 1 (Destination: 3D Cenima)
     def lamoveup_ad1():
@@ -464,13 +459,13 @@ def run1(color=1):
     
     # Mission: Audience Delivery - 2 (Destination: Skateboard area)
     gyrospinturn(36, 150)
-    # Move towards the skateboard area (the audience id moved to the skateboard area)
-    accDecDrive(3.3,30,300,0.3,0.3)
+    """# Move towards the skateboard area (the audience id moved to the skateboard area)
+    accDecGems(3.3,30,300,0.3,0.3)
     # Move backward slightly to clear way for the audience to be delivered in the next step
     simplemovestraight(-0.5,100)
     # Rotate left to deliver the audience at the same align the left arm correctly towards the 
     # Stage manager loop
-    gyrospinturn(-70,150)
+    gyrospinturn(-73,150)
 
     #Mission: Expert delivery - 1 (Stage Manager collection)
     def ramovedowntostagemanager():
@@ -498,12 +493,12 @@ def run1(color=1):
     # Mission Theater Scene Change
     run_parallel(liftstagemanager,spintoscenechange)
     
-    simplemovestraight(0.46,100)
-    simplemovestraight(-0.46,100)
+    simplemovestraight(0.5,100)
+    simplemovestraight(-0.5,100)
     # If Orange color, change scene one more time 
     if color == 2: 
-        simplemovestraight(0.47,100)
-        simplemovestraight(-0.54,100)
+        simplemovestraight(0.51,100)
+        simplemovestraight(-0.58,100)
 
     # Mission Virtual Reality 
     gyrospinturn(67, 200)
@@ -513,7 +508,7 @@ def run1(color=1):
     # Turn to align to the mission
     gyrospinturn(50,200)
     #Move forward to the mission VR
-    accDecDrive(1.05,30,250,0.3,0.3)
+    accDecGems(1.05,30,250,0.3,0.3)
     # Lower the left arm fast till it touches the orange lever
     left_medium_motor.reset_angle(0)
     left_medium_motor.run_target(350,-90, Stop.BRAKE, True)
@@ -553,14 +548,13 @@ def run1(color=1):
     simplemovestraight(-0.1,80)
     gyrospinturn(-57.5, 200)
 
-    accDecDrive(2.3, 30, 300, 0.2, 0.2)
-    left_medium_motor.run_time(-300, 500)
-
-
-    
+    accDecGems(2.3, 30, 300, 0.2, 0.2)
+    left_medium_motor.run_time(-300, 500)"""
 
 def run2():
-    aligntophy(-30, 150)
+    gyro_soft_calib()
+    gyrospinturn(90, 200)
+    gyro_read_angle()
     
 
 #---------------------------------------  
