@@ -492,38 +492,6 @@ def run1():
     simplemovestraight(-4.3, 300)
 
     #********* End of Run 1 *********
-    
-    """# Mission Expert Delivery - 2 (Collecting Sound Engineer)
-    # Turn away from Virtual Reality 
-    gyrospinturn(25,200)
-    # Move towards Sound Mixer
-    simplemovestraight(0.45,150)
-    # Rotate towards sound mixer
-    gyrospinturn(63,200) 
-    # Move bacwards little bit so that when right arm is brought down it will not
-    # disturb the sound engineer
-    simplemovestraight(-0.25, 150)
-   
-    # Bring the right arm dowm to prepare to pickup sound engineer 
-    right_medium_motor.reset_angle(0)
-    right_medium_motor.run_target(150,-74, Stop.BRAKE)
-
-    # Rotate right to alighn the arm with sound engineer loop
-    gyrospinturn(7,150)
-
-    # Move forward into the loop of the sound engineer   
-    simplemovestraight(0.4, 100)
-
-    #pick up sound engineer
-    right_medium_motor.reset_angle(0)
-    right_medium_motor.run_target(100, 65, Stop.BRAKE)
-       
-    #Mission: Immersive Experience Model
-    simplemovestraight(-0.1,80)
-    gyrospinturn(-57.5, 200)
-
-    accDecGems(2.3, 30, 300, 0.2, 0.2)
-    left_medium_motor.run_time(-300, 500)"""
 
 #***********************************************
 # Run 2 
@@ -552,12 +520,12 @@ def run2(color = 1):
     simplemovestraight(-0.25,100)
     def rotatetostagemanager():
         gyrospinturn(10,150)
-    def ramovedowntostagemanager():
+    def ramovedowntoexpert():
         right_medium_motor.reset_angle(0)
         right_medium_motor.run_target(200, -75, Stop.BRAKE, False)
     # Rotate the robot to position aligning towards the stage manager and bring the right arm down
     # simultaneously
-    run_parallel(rotatetostagemanager, ramovedowntostagemanager)
+    run_parallel(rotatetostagemanager, ramovedowntoexpert)
     # Move straight into the loop of the stage manager
     simplemovestraight(0.5,100)
     def movebackfromstagemanager():
@@ -598,9 +566,54 @@ def run2(color = 1):
     left_medium_motor.reset_angle(0)
     left_medium_motor.run_target(350,-90, Stop.BRAKE, True)
     # Lower the left arm again fast so that the entire force is used to lower the lever
-    left_medium_motor.run_time(-350,1500, Stop.BRAKE, True)
+    left_medium_motor.run_time(-350,1000, Stop.BRAKE, True)
     # Raise the left arm to complete the mission.
     left_medium_motor.run_time(350,1000, Stop.BRAKE, True)
+
+    # *** Expert delivery - 2 (Collecting sound engineer)
+    # Move forward little bit so that robot will not hit sound mixer in the rotation done below
+    simplemovestraight(0.4,150)
+    # Rotate towards the sound engineer. The right arm is in line with the loop of the sound engineer
+    gyrospinturn(98,150)
+    # Bring the right arm to pickup the sound engineer
+    ramovedowntoexpert()
+    # Move into the loop of the sound engineer
+    simplemovestraight(0.5,150)
+    # Pick up sound engineer by lifting the right arm
+    right_medium_motor.reset_angle(0)
+    right_medium_motor.run_target(100, 65, Stop.BRAKE)
+    
+    # *** Mission: Augmented reality ***
+    # Re-init the gyro to reset the accumulated error (Make sure that the robot is still here)
+    gyro_soft_calib()
+    # Rotate towards the AR mission
+    gyrospinturn(-90,150)
+    # Move towards the AR mission
+    accDecGems(2,30,300,0.2,0.2)
+    # Rotate left slightly to position the robot arm to the left of the orange activator
+    gyrospinturn(-15,150)
+    # Move forward to keep the orange activator at the robot arm lenght
+    simplemovestraight(0.5,150)
+    # Lower the rigt arm. The right arm is touching the floor just left to the orange activator
+    left_medium_motor.reset_angle(0)
+    left_medium_motor.run_time(-350,500, Stop.BRAKE, True)
+    # Rotate clockwise to activate the orange lever
+    gyrospinturn(25,200)
+    # Continue activating the orange lever by pushing foward from this point onwards
+    simplemovestraight(0.6,150)
+    # Complete the activating the orange lever by pushing sideways left
+    gyrospinturn(-10,150)
+    
+    # ***Mission: Craft Creater - 1 (Opening the Printer)***
+    # Rotate towards VR craft createor mission
+    gyrospinturn(50,151)
+    # Bring up the right arm to level with the organge lid of the 3D printer
+    left_medium_motor.reset_angle(0)
+    left_medium_motor.run_target(350,38, Stop.BRAKE, True)
+    # Move the robot right arm under the 3D printer's orange lid
+    simplemovestraight(0.55,150)
+    """left_medium_motor.reset_angle(0)
+    left_medium_motor.run_time(250,500, Stop.BRAKE, True)"""
 
 #************************************************
 # Run 3 
