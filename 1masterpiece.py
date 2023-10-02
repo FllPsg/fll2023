@@ -470,7 +470,7 @@ def run1():
     
     # *** Mission: Audience Delivery - 1 (Destination: 3D Cenima) ***
     def lamoveup_ad1():
-        left_medium_motor.reset_angle(0)
+        left_medium_motor.reset_angle(0) 
         left_medium_motor.run_time(350,1000, Stop.BRAKE, False)
 
     def movefwd_ad1():  
@@ -576,12 +576,13 @@ def run2(color = 1):
     # Rotate towards the sound engineer. The right arm is in line with the loop of the sound engineer
     gyrospinturn(98,150)
     # Bring the right arm to pickup the sound engineer
-    ramovedowntoexpert()
+    right_medium_motor.reset_angle(0)
+    right_medium_motor.run_target(150, -75, Stop.BRAKE, True)
     # Move into the loop of the sound engineer
     simplemovestraight(0.5,150)
     # Pick up sound engineer by lifting the right arm
     right_medium_motor.reset_angle(0)
-    right_medium_motor.run_target(100, 65, Stop.BRAKE)
+    right_medium_motor.run_time(100, 500, Stop.BRAKE, True)
     
     # *** Mission: Augmented reality ***
     # Re-init the gyro to reset the accumulated error (Make sure that the robot is still here)
@@ -593,7 +594,7 @@ def run2(color = 1):
     # Rotate left slightly to position the robot arm to the left of the orange activator
     gyrospinturn(-15,150)
     # Move forward to keep the orange activator at the robot arm lenght
-    simplemovestraight(0.5,150)
+    simplemovestraight(0.45,150)
     # Lower the rigt arm. The right arm is touching the floor just left to the orange activator
     left_medium_motor.reset_angle(0)
     left_medium_motor.run_time(-350,500, Stop.BRAKE, True)
@@ -604,16 +605,31 @@ def run2(color = 1):
     # Complete the activating the orange lever by pushing sideways left
     gyrospinturn(-10,150)
     
-    # ***Mission: Craft Creater - 1 (Opening the Printer)***
+    # *** Mission: Craft Creater - 1 (Opening the Printer) ***
     # Rotate towards VR craft createor mission
-    gyrospinturn(50,151)
+    gyrospinturn(51,150)
     # Bring up the right arm to level with the organge lid of the 3D printer
     left_medium_motor.reset_angle(0)
     left_medium_motor.run_target(350,38, Stop.BRAKE, True)
     # Move the robot right arm under the 3D printer's orange lid
-    simplemovestraight(0.55,150)
-    """left_medium_motor.reset_angle(0)
-    left_medium_motor.run_time(250,500, Stop.BRAKE, True)"""
+    simplemovestraight(0.6,150)
+    # Lift the lid up
+    left_medium_motor.run_time(75,500, Stop.BRAKE, True)
+
+    # *** Mission: Expert Delivery - 3 (Delivering Sound engineer) ***
+    # Rotate left slightly to prepare to move towards the music concert destination area
+    gyrospinturn(-65, 150)
+    # Move towards the music concert delivery area
+    accDecGems(1.5,30,250,0.3,0.3)
+    # Rotate left to make the expert delivery carrier in line with the music concert destination area
+    gyrospinturn(-50, 150)
+    # Move straight to position sound engineer such that when right arm is lowered the sound engnieer is
+    # placed in the music concert delivery area.
+    simplemovestraight(0.25, 150)
+    # Slowly lower the sound engineer to a level so that the when we pull back, only the sound engineer
+    # is left in the destination and the stage manager is still on the right arm.
+    right_medium_motor.reset_angle(0)
+    right_medium_motor.run_target(100, -40, Stop.BRAKE, True)
 
 #************************************************
 # Run 3 
