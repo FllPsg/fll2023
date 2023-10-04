@@ -94,6 +94,7 @@ except OSError as ex:
     else:
         ev3.screen.print("Gyro: OSError {}".format(ex.args[0]))
     ev3.speaker.beep()
+    wait(3000)
 
 # Instantiate the left medium motor
 try:
@@ -490,6 +491,7 @@ def run1():
     gyrospinturn(25,250)
     # Move back straignt to return to left launch area.
     simplemovestraight(-4.3, 300)
+    robot.stop()
 
     #********* End of Run 1 *********
 
@@ -551,7 +553,7 @@ def run2(color = 1):
 
     # Prepare for align to black again to reset the errors created due to shacking of the robot while 
     # performing theater scene change mission
-    gyrospinturn(-8,150)
+    gyrospinturn(-11,150)
     # Align to black. This positions the robot in the same spot with same orientation after completinng 
     # theater scene change mission, irrespective of pink or orange scene change. 
     aligntoblack()
@@ -566,7 +568,7 @@ def run2(color = 1):
     left_medium_motor.reset_angle(0)
     left_medium_motor.run_target(350,-90, Stop.BRAKE, True)
     # Lower the left arm again fast so that the entire force is used to lower the lever
-    left_medium_motor.run_time(-350,1000, Stop.BRAKE, True)
+    left_medium_motor.run_time(-350,1500, Stop.BRAKE, True)
     # Raise the left arm to complete the mission.
     left_medium_motor.run_time(350,1000, Stop.BRAKE, True)
 
@@ -574,32 +576,32 @@ def run2(color = 1):
     # Move forward little bit so that robot will not hit sound mixer in the rotation done below
     simplemovestraight(0.4,150)
     # Rotate towards the sound engineer. The right arm is in line with the loop of the sound engineer
-    gyrospinturn(98,150)
+    gyrospinturn(96,150)
     # Bring the right arm to pickup the sound engineer
     right_medium_motor.reset_angle(0)
     right_medium_motor.run_target(150, -75, Stop.BRAKE, True)
     # Move into the loop of the sound engineer
-    simplemovestraight(0.5,150)
+    simplemovestraight(0.55,150)
     # Pick up sound engineer by lifting the right arm
     right_medium_motor.reset_angle(0)
-    right_medium_motor.run_time(100, 500, Stop.BRAKE, True)
+    right_medium_motor.run_time(100, 750, Stop.BRAKE, True)
     
     # *** Mission: Augmented reality ***
     # Re-init the gyro to reset the accumulated error (Make sure that the robot is still here)
-    gyro_soft_calib()
+    #gyro_soft_calib()
     # Rotate towards the AR mission
-    gyrospinturn(-90,150)
+    gyrospinturn(-81,150)
     # Move towards the AR mission
-    accDecGems(2,30,300,0.2,0.2)
+    accDecGems(1.55,30,250,0.2,0.2)
     # Rotate left slightly to position the robot arm to the left of the orange activator
-    gyrospinturn(-15,150)
+    gyrospinturn(-28,150)
     # Move forward to keep the orange activator at the robot arm lenght
-    simplemovestraight(0.45,150)
-    # Lower the rigt arm. The right arm is touching the floor just left to the orange activator
+    accDecGems(1.0,30,250,0.2,0.2)
+    # Lower the left arm. The left arm is touching the floor, just left to the orange activator
     left_medium_motor.reset_angle(0)
     left_medium_motor.run_time(-350,500, Stop.BRAKE, True)
     # Rotate clockwise to activate the orange lever
-    gyrospinturn(25,200)
+    gyrospinturn(24,200)
     # Continue activating the orange lever by pushing foward from this point onwards
     simplemovestraight(0.6,150)
     # Complete the activating the orange lever by pushing sideways left
@@ -607,12 +609,12 @@ def run2(color = 1):
     
     # *** Mission: Craft Creater - 1 (Opening the Printer) ***
     # Rotate towards VR craft createor mission
-    gyrospinturn(51,150)
-    # Bring up the right arm to level with the organge lid of the 3D printer
+    gyrospinturn(57,150)
+    # Bring up the left arm to level with the organge lid of the 3D printer
     left_medium_motor.reset_angle(0)
-    left_medium_motor.run_target(350,38, Stop.BRAKE, True)
-    # Move the robot right arm under the 3D printer's orange lid
-    simplemovestraight(0.6,150)
+    left_medium_motor.run_target(350,41, Stop.BRAKE, True)
+    # Move the robot left arm under the 3D printer's orange lid
+    simplemovestraight(0.57,150)
     # Lift the lid up
     left_medium_motor.run_time(75,500, Stop.BRAKE, True)
 
@@ -620,16 +622,24 @@ def run2(color = 1):
     # Rotate left slightly to prepare to move towards the music concert destination area
     gyrospinturn(-65, 150)
     # Move towards the music concert delivery area
-    accDecGems(1.5,30,250,0.3,0.3)
+    accDecGems(1.55,30,250,0.3,0.3)
     # Rotate left to make the expert delivery carrier in line with the music concert destination area
     gyrospinturn(-50, 150)
     # Move straight to position sound engineer such that when right arm is lowered the sound engnieer is
     # placed in the music concert delivery area.
-    simplemovestraight(0.25, 150)
+    simplemovestraight(0.3, 150)
     # Slowly lower the sound engineer to a level so that the when we pull back, only the sound engineer
     # is left in the destination and the stage manager is still on the right arm.
     right_medium_motor.reset_angle(0)
-    right_medium_motor.run_target(100, -40, Stop.BRAKE, True)
+    right_medium_motor.run_target(100, -50, Stop.BRAKE, True)
+    simplemovestraight(0.1,150)
+    # Raise right arm so that only the stage manager is lifted up but the sound engineer is left on the 
+    # floor
+    right_medium_motor.reset_angle(0)
+    right_medium_motor.run_time(150,1500, Stop.BRAKE, False)
+
+    robot.stop()
+    
 
 #************************************************
 # Run 3 
