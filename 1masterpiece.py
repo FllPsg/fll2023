@@ -561,7 +561,7 @@ def run2(color = 1):
     # *** Mission: Immersive Experience ***
     # Spin rotate towards the immersive experience mission such that the left arm is in line with
     # the orange lever
-    gyrospinturn(117, 150)
+    gyrospinturn(116, 150)
     #Move forward to the immersive experience mission
     accDecGems(1.4,30,250,0.3,0.3)
     # Lower the left arm fast till it touches the orange lever
@@ -571,6 +571,7 @@ def run2(color = 1):
     left_medium_motor.run_time(-350,1500, Stop.BRAKE, True)
     # Raise the left arm to complete the mission.
     left_medium_motor.run_time(350,1000, Stop.BRAKE, True)
+    gyro_soft_calib()
 
     # *** Expert delivery - 2 (Collecting sound engineer)
     # Move forward little bit so that robot will not hit sound mixer in the rotation done below
@@ -588,7 +589,7 @@ def run2(color = 1):
     
     # *** Mission: Augmented reality ***
     # Re-init the gyro to reset the accumulated error (Make sure that the robot is still here)
-    gyro_soft_calib()
+    #gyro_soft_calib()
     # Rotate towards the AR mission
     gyrospinturn(-81,150)
     # Move towards the AR mission
@@ -609,18 +610,18 @@ def run2(color = 1):
     
     # *** Mission: Craft Creater - 1 (Opening the Printer) ***
     # Rotate towards VR craft createor mission
-    gyrospinturn(57,150)
+    gyrospinturn(56,150)
     # Bring up the left arm to level with the organge lid of the 3D printer
     left_medium_motor.reset_angle(0)
-    left_medium_motor.run_target(350,44, Stop.BRAKE, True)
+    left_medium_motor.run_target(350,44.1, Stop.BRAKE, True)
     # Move the robot left arm under the 3D printer's orange lid
     simplemovestraight(0.55,150)
     # Lift the lid up
-    left_medium_motor.run_time(75,500, Stop.BRAKE, True)
+    left_medium_motor.run_time(87,500, Stop.BRAKE, True)
 
     # *** Mission: Expert Delivery - 3 (Delivering Sound engineer) ***
     # Rotate left slightly to prepare to move towards the music concert destination area
-    gyrospinturn(-60, 150)
+    gyrospinturn(-61, 150)
     # Move towards the music concert delivery area and rest the left arm so tht left arm does 
     # not hit the wall
     def movetosoundengineerdestination():
@@ -640,8 +641,12 @@ def run2(color = 1):
     # floor
     right_medium_motor.reset_angle(0)
     right_medium_motor.run_time(150,1500, Stop.BRAKE, False)
-
+    # Turn and towards right launch area and return to right home
+    gyrospinturn(120, 150)
+    simplemovestraight(4, 300)  
     robot.stop()
+    
+    #********* End of Run 2 *********
     
 
 #************************************************
@@ -656,6 +661,16 @@ def run3():
 def run4():
     gyro_soft_calib() 
     gems2blackfwd(0.95,0.05, 100, 1)
+    """# *** Mission: Music Concert ***
+    simplemovestraight(-0.2,150)
+    # Rotate towards the aligning line infront of the music concert
+    gyrospinturn(99, 150)
+    gems2blackfwd(0.95,0.05, 100, 1)
+    # Prepare to aligning to black line
+    gyrospinturn(-40,150)
+    simplemovestraight(0.25,100)
+    # Alighn to black line (near theater scene change mission)
+    aligntoblack()"""
 
 #****************************************************
 # Main program loop starts here
