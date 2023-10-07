@@ -524,7 +524,7 @@ def run2(color = 1):
         gyrospinturn(10,150)
     def ramovedowntoexpert():
         right_medium_motor.reset_angle(0)
-        right_medium_motor.run_target(200, -75, Stop.BRAKE, False)
+        right_medium_motor.run_target(200, -77, Stop.BRAKE, False)
     # Rotate the robot to position aligning towards the stage manager and bring the right arm down
     # simultaneously
     run_parallel(rotatetostagemanager, ramovedowntoexpert)
@@ -610,14 +610,16 @@ def run2(color = 1):
     
     # *** Mission: Craft Creater - 1 (Opening the Printer) ***
     # Rotate towards VR craft createor mission
-    gyrospinturn(56,150)
+    gyrospinturn(57,150)
+    # Reset the left arm
+    left_medium_motor.run_time(350,1000, Stop.BRAKE, True)
     # Bring up the left arm to level with the organge lid of the 3D printer
     left_medium_motor.reset_angle(0)
-    left_medium_motor.run_target(350,44.1, Stop.BRAKE, True)
+    left_medium_motor.run_target(350,-87, Stop.BRAKE, True)
     # Move the robot left arm under the 3D printer's orange lid
-    simplemovestraight(0.55,150)
+    simplemovestraight(0.50,150)
     # Lift the lid up
-    left_medium_motor.run_time(87,500, Stop.BRAKE, True)
+    left_medium_motor.run_time(200,1000, Stop.BRAKE, True)
 
     # *** Mission: Expert Delivery - 3 (Delivering Sound engineer) ***
     # Rotate left slightly to prepare to move towards the music concert destination area
@@ -635,15 +637,15 @@ def run2(color = 1):
     # Slowly lower the sound engineer to a level so that the when we pull back, only the sound engineer
     # is left in the destination and the stage manager is still on the right arm.
     right_medium_motor.reset_angle(0)
-    right_medium_motor.run_target(100, -60, Stop.BRAKE, True)
-    simplemovestraight(-0.3,150)
+    right_medium_motor.run_target(100, -66, Stop.BRAKE, True)
+    simplemovestraight(-0.35,150)
     # Raise right arm so that only the stage manager is lifted up but the sound engineer is left on the 
     # floor
     right_medium_motor.reset_angle(0)
     right_medium_motor.run_time(150,1500, Stop.BRAKE, False)
     # Turn and towards right launch area and return to right home
     gyrospinturn(120, 150)
-    simplemovestraight(4, 300)  
+    simplemovestraight(4, 300)
     robot.stop()
     
     #********* End of Run 2 *********
@@ -653,7 +655,20 @@ def run2(color = 1):
 # Run 3 
 #************************************************
 def run3():
-    pass 
+    gyro_soft_calib()
+    # Rotate towards Craft creator mission
+    gyrospinturn(62, 150)
+    # Move forward to close the pink panel
+    accDecGems(3.75,30,300,0.3,0.3)
+    # Rotate left to avoid AR model
+    gyrospinturn(-60, 150)
+    # Move away from AR model
+    accDecGems(1.5,30,300,0.3,0.3)
+    # Rotate right towards Master piece destination
+    gyrospinturn(36, 150)
+    # Move and deliver the audience and expert at the Masterpiece destination
+    accDecGems(1.3,30,250,0.3,0.3)
+    robot.stop()
 
 #************************************************
 # Run 4
