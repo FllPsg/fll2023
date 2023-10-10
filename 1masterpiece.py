@@ -493,7 +493,7 @@ def run1():
     simplemovestraight(-4.3, 300)
     robot.stop()
 
-    #********* End of Run 1 *********
+#********* End of Run 1 *********
 
 #***********************************************
 # Run 2 
@@ -648,7 +648,7 @@ def run2(color = 1):
     simplemovestraight(4, 300)
     robot.stop()
     
-    #********* End of Run 2 *********
+#********* End of Run 2 *********
     
 
 #************************************************
@@ -658,8 +658,8 @@ def run3():
     gyro_soft_calib()
     # Rotate towards Craft creator mission
     gyrospinturn(62, 150)
-    # Move forward to close the pink panel
-    accDecGems(3.75,30,300,0.3,0.3)
+    # Move forward to close the pink panel of 3D printer
+    accDecGems(3.6,30,300,0.3,0.3)
     # Rotate left to avoid AR model
     gyrospinturn(-60, 150)
     # Move away from AR model
@@ -667,25 +667,71 @@ def run3():
     # Rotate right towards Master piece destination
     gyrospinturn(36, 150)
     # Move and deliver the audience and expert at the Masterpiece destination
-    accDecGems(1.3,30,250,0.3,0.3)
+    accDecGems(1.35,30,250,0.3,0.3)
+    # Return to base
+    # Go backward to deliver the items 
+    accDecGems(-1.3,30,250,0.3,0.3)
+    # Rotate left to face robot back towards wall
+    gyrospinturn(-37,150)
+    # Go backwards till robot is in line with base
+    accDecGems(-1.8,30,250,0.3,0.3)
+    # Rotate right towards base 
+    gyrospinturn(68,150)
+    # Move backward to base
+    simplemovestraight(-3.75,300)
     robot.stop()
+
+#********* End of Run 3 *********
 
 #************************************************
 # Run 4
 #************************************************
 def run4():
-    gyro_soft_calib() 
-    gems2blackfwd(0.95,0.05, 100, 1)
-    """# *** Mission: Music Concert ***
-    simplemovestraight(-0.2,150)
-    # Rotate towards the aligning line infront of the music concert
-    gyrospinturn(99, 150)
-    gems2blackfwd(0.95,0.05, 100, 1)
+    gyro_soft_calib()
+    # Start from the base
+    # Rotate towards the aligning line near music concert mission
+    gyrospinturn(70, 150)
+    # Move straight to the aligning line
+    accDecGems(2.75,30,300,0.3,0.3)
+    gems2blackfwd(0.95,0.05, 100, 4)
     # Prepare to aligning to black line
-    gyrospinturn(-40,150)
+    gyrospinturn(40,150)
     simplemovestraight(0.25,100)
-    # Alighn to black line (near theater scene change mission)
-    aligntoblack()"""
+    # Alighn to black line (near music concert mission)
+    aligntoblack()
+
+    # *** Mission: Music Concert : Speaker ***
+    # Rotate towards the speaker leaver
+    gyrospinturn(-5,100)
+    # Reset the left arm to the floor and reset the angle
+    left_medium_motor.run_time(-200,300, Stop.BRAKE, True)
+    left_medium_motor.reset_angle(0)
+    # Move forward to move left arm under the speaker lever
+    simplemovestraight(0.23,150)
+    # Raise the left arm to activate the speaker lever to turn the speaker
+    left_medium_motor.run_target(150,30, Stop.BRAKE, True)
+    # Rotate robot left too continue activating the speaker lever
+    gyrospinturn(-7,100)
+    # Lower the left arm down to continue activating the speaker lever by pushing it down
+    left_medium_motor.run_target(150,-15, Stop.BRAKE, True)
+    # Mission complete. Reset the left arm.
+    left_medium_motor.run_time(200,1000, Stop.BRAKE, True)
+
+    # *** Mission : Music Concert : Hologram Performer ***
+    # Move forward to move the orange panel forward open the hologram performer
+    simplemovestraight(0.55,150)
+
+    # *** Mission : Music Concert : Lights ***
+    # Move backwards to give room for ratating the left arm to activate the lights lever
+    simplemovestraight(-0.1,150)
+    # Rotate to position the left arm to prepare for activating the lights lever
+    gyrospinturn(37,150)
+    # Lower the left arm on the lights beam
+    left_medium_motor.run_time(-150,500,Stop.BRAKE, True)
+    # Roate the robot right to activate the lights lever.
+    gyrospinturn(43,150)
+
+    robot.stop()
 
 #****************************************************
 # Main program loop starts here
