@@ -689,6 +689,7 @@ def run3():
 def run4():
     gyro_soft_calib()
     # Start from the base
+    run_parallel(resetleftmediummotor, resetrightmediummotor)
     # Rotate towards the aligning line near music concert mission
     gyrospinturn(70, 150)
     # Move straight to the aligning line
@@ -702,24 +703,26 @@ def run4():
 
     # *** Mission: Music Concert : Speaker ***
     # Rotate towards the speaker leaver
-    gyrospinturn(-5,100)
+    gyrospinturn(-6,100)
     # Reset the left arm to the floor and reset the angle
-    left_medium_motor.run_time(-200,300, Stop.BRAKE, True)
+    left_medium_motor.run_time(-200,600, Stop.BRAKE, True)
     left_medium_motor.reset_angle(0)
     # Move forward to move left arm under the speaker lever
     simplemovestraight(0.23,150)
     # Raise the left arm to activate the speaker lever to turn the speaker
-    left_medium_motor.run_target(150,30, Stop.BRAKE, True)
+    left_medium_motor.run_target(150, 40, Stop.BRAKE, True)
     # Rotate robot left too continue activating the speaker lever
     gyrospinturn(-7,100)
     # Lower the left arm down to continue activating the speaker lever by pushing it down
     left_medium_motor.run_target(150,-15, Stop.BRAKE, True)
+    # Move backward little bit to avoid left arm getting stuck at the orange lever when left arm is reset
+    simplemovestraight(-0.1,150)
     # Mission complete. Reset the left arm.
     left_medium_motor.run_time(200,1000, Stop.BRAKE, True)
 
     # *** Mission : Music Concert : Hologram Performer ***
     # Move forward to move the orange panel forward open the hologram performer
-    simplemovestraight(0.55,150)
+    simplemovestraight(0.65,150)
 
     # *** Mission : Music Concert : Lights ***
     # Move backwards to give room for ratating the left arm to activate the lights lever
@@ -730,6 +733,8 @@ def run4():
     left_medium_motor.run_time(-150,500,Stop.BRAKE, True)
     # Roate the robot right to activate the lights lever.
     gyrospinturn(43,150)
+    # Reset the left arm
+    left_medium_motor.run_time(350,1000, Stop.BRAKE, True)
 
     robot.stop()
 
