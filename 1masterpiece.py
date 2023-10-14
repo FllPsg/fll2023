@@ -372,37 +372,38 @@ def simplemovestraight(distance_rotation, speed):
     robot_stop()
 
 def show_menu(row):
+    battery_level = ev3.battery.voltage()/1000
     ev3.screen.clear()
     if row == 1:
         ev3.screen.print("Run 1 ___")
         ev3.screen.print("Run 2.pink")
         ev3.screen.print("Run 2.orange")
         ev3.screen.print("Run 3")
-        ev3.screen.print("Run 4")
+        ev3.screen.print("Run 4       Bat:{:.2f}".format(battery_level))
     elif row == 2:
         ev3.screen.print("Run 1")
         ev3.screen.print("Run 2.pink ___")
         ev3.screen.print("Run 2.orange")
         ev3.screen.print("Run 3")
-        ev3.screen.print("Run 4")
+        ev3.screen.print("Run 4       Bat:{:.2f}".format(battery_level))
     elif row == 3:
         ev3.screen.print("Run 1")
         ev3.screen.print("Run 2.pink")
         ev3.screen.print("Run 2.orange ___")
         ev3.screen.print("Run 3")
-        ev3.screen.print("Run 4")
-    elif row == 4:       
+        ev3.screen.print("Run 4       Bat:{:.2f}".format(battery_level))
+    elif row == 4:
         ev3.screen.print("Run 1")
         ev3.screen.print("Run 2.pink")
         ev3.screen.print("Run 2.orange")
         ev3.screen.print("Run 3 ___")
-        ev3.screen.print("Run 4")
+        ev3.screen.print("Run 4       Bat:{:.2f}".format(battery_level))
     elif row == 5:
         ev3.screen.print("Run 1")
         ev3.screen.print("Run 2.pink")
         ev3.screen.print("Run 2.orange")
         ev3.screen.print("Run 3")
-        ev3.screen.print("Run 4 ___")
+        ev3.screen.print("Run 4 ___ Bat:{:.2f}".format(battery_level))
      
 def get_menu_selection():
     global current_row
@@ -691,7 +692,7 @@ def run4():
     # Start from the base
     run_parallel(resetleftmediummotor, resetrightmediummotor)
     # Rotate towards the aligning line near music concert mission
-    gyrospinturn(70, 150)
+    gyrospinturn(69, 150)
     # Move straight to the aligning line
     accDecGems(2.75,30,300,0.3,0.3)
     gems2blackfwd(0.95,0.05, 100, 4)
@@ -706,15 +707,18 @@ def run4():
     gyrospinturn(-6,100)
     # Reset the left arm to the floor and reset the angle
     left_medium_motor.run_time(-200,600, Stop.BRAKE, True)
-    left_medium_motor.reset_angle(0)
     # Move forward to move left arm under the speaker lever
-    simplemovestraight(0.23,150)
-    # Raise the left arm to activate the speaker lever to turn the speaker
-    left_medium_motor.run_target(150, 40, Stop.BRAKE, True)
-    # Rotate robot left too continue activating the speaker lever
+    simplemovestraight(0.27,150)
+    # Reset the left arm. This moves the lever up and at the same resets to prepare to
+    # bring down the arm to rotate
+    left_medium_motor.run_time(350,600, Stop.BRAKE, True)
+    # Bring down the left arm at level of middle of vertical part of the lever
+    left_medium_motor.reset_angle(0)
+    left_medium_motor.run_target(150, -87, Stop.BRAKE, True)
+    # Rotate robot left to continue activating the speaker lever
     gyrospinturn(-7,100)
     # Lower the left arm down to continue activating the speaker lever by pushing it down
-    left_medium_motor.run_target(150,-15, Stop.BRAKE, True)
+    left_medium_motor.run_time(-150, 300, Stop.BRAKE, True)
     # Move backward little bit to avoid left arm getting stuck at the orange lever when left arm is reset
     simplemovestraight(-0.1,150)
     # Mission complete. Reset the left arm.
@@ -738,10 +742,16 @@ def run4():
 
     robot.stop()
 
+def test():
+    simplemovestraight(0.5, 150)
+    gyrospinturn(35, 150)
+    robot.stop()
+
 #****************************************************
 # Main program loop starts here
 #****************************************************
 current_row = 1
+battery_level = 8.30
 while True:
     key = get_menu_selection()
     ev3.screen.clear()
