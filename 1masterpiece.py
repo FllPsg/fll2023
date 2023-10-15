@@ -738,7 +738,66 @@ def run4():
     # Roate the robot right to activate the lights lever.
     gyrospinturn(43,150)
     # Reset the left arm
-    left_medium_motor.run_time(350,1000, Stop.BRAKE, True)
+    left_medium_motor.run_time(350,500, Stop.BRAKE, True)
+
+    # *** Mission: VR Artist ***
+    # Rotate left and move backward as preparation for align to black
+    gyrospinturn(-75,150)
+    simplemovestraight(-0.75,150)
+    # Align to black
+    aligntoblack()
+    # Rotate left to position back of the robot towards the right home area
+    gyrospinturn(-47,150)
+    # Move to right home area and stop in place to align the robot inline with VR artist
+    accDecGems(-2.75,30,300,0.3,0.3)
+    def turntovrartist():
+        gyrospinturn(-45,150)
+    def ladownvrartist():
+        left_medium_motor.run_time(-200,600, Stop.BRAKE, False)
+    # Reset the left arm to the floor and reset the angle and turn to vr artist
+    run_parallel(turntovrartist, ladownvrartist)
+    # Move strainght so that the left arm is under the VR artist model's tier
+    simplemovestraight(1.05,150)
+    # Raise the left arm to activate the VR artist. The lever is activated twice to move the 
+    # chicken not touching the grey pin.
+    left_medium_motor.run_time(350,1500, Stop.BRAKE, True)
+    left_medium_motor.run_time(-350,200, Stop.BRAKE, True)
+    simplemovestraight(-0.3, 150)
+    simplemovestraight(0.3,150)
+    # Raise the left arm to activate the vr artist
+    left_medium_motor.run_time(350,1500, Stop.BRAKE, True)
+
+    # *** Mission: Expert Delivery 4 - Delivering Stage Manager in the movie set destination ***
+    # Move back and turn towards the movie set
+    simplemovestraight(-0.25, 150)
+    gyrospinturn(-50, 150)
+    def lamoveupvrartist():
+        left_medium_motor.run_time(350,1000, Stop.BRAKE, False)
+    def movetomovieset():
+        accDecGems(3.1,30,300,0.3,0.3)
+    # Move towards move set
+    run_parallel(lamoveupvrartist, movetomovieset)
+    # Move to spot to place the sound engineer and turn towards the spot
+    gyrospinturn(-70, 150)
+    simplemovestraight(0.05, 150)
+    # Lower arm to drop stage manager in movie set destination
+    right_medium_motor.reset_angle(0)
+    right_medium_motor.run_target(200, -75, Stop.BRAKE, True)
+    # After dropping the stage manager move backward to deliver the stage manager
+    simplemovestraight(-0.25, 150)
+
+    # *** Mission: Movie set - 1 (Lifting orange lever) ***
+    # Rotate right to position the right arm in line with the movie set orange lever
+    gyrospinturn(7, 150)
+    # Move towards the movie set rail
+    simplemovestraight(1.05, 150)
+    # Lower the right arm to place the right arm on the movie set rail
+    right_medium_motor.reset_angle(0)
+    right_medium_motor.run_target(200, -30, Stop.BRAKE, True)
+    # Rotate the robot right to bring the movie set orange lever down
+    gyrospinturn(10, 150)
+    # Reset the arm
+    right_medium_motor.run_time(350, 1000, Stop.BRAKE, False)
 
     robot.stop()
 
