@@ -779,7 +779,7 @@ def run4():
     # Move towards the movie set rail
     simplemovestraight(1.1, 150)
     # Lower the right arm to place the right arm on the movie set orange lever
-    right_medium_motor.run_time(-200, 600, Stop.BRAKE, True)
+    right_medium_motor.run_time(-200, 750, Stop.BRAKE, True)
     # Rotate the robot right to bring the movie set orange lever down
     gyrospinturn(7,150) 
 
