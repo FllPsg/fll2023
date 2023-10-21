@@ -455,7 +455,6 @@ def run1():
         left_medium_motor.run_target(200,-68, Stop.BRAKE)
 
     #Initialize devices initial positions
-    gyro_soft_calib()
     left_medium_motor.stop()
     right_medium_motor.stop()
 
@@ -472,7 +471,6 @@ def run1():
     
     # *** Mission: Audience Delivery - 1 (Destination: 3D Cenima) ***
     def lamoveup_ad1():
-        left_medium_motor.reset_angle(0) 
         left_medium_motor.run_time(350,1000, Stop.BRAKE, False)
 
     def movefwd_ad1():  
@@ -484,14 +482,14 @@ def run1():
     # *** Mission: Audience Delivery - 2 (Destination: Skateboard area) ***
     gyrospinturn(36, 150)
     # Move towards the skateboard area (the audience id moved to the skateboard area)
-    accDecGems(3.4,30,300,0.3,0.3)
+    accDecGems(3.4,30,450,0.3,0.3)
     # Move backward slightly to clear way for the audience to be delivered in the next step
     simplemovestraight(-0.4,100)
     gyrospinturn(-20, 150)
     simplemovestraight(-0.25, 100)
     gyrospinturn(25,250)
     # Move back straignt to return to left launch area.
-    simplemovestraight(-4.3, 300)
+    simplemovestraight(-4.1, 500)
     robot.stop()
 
 #********* End of Run 1 *********
@@ -656,30 +654,33 @@ def run2(color = 1):
 # Run 3 
 #************************************************
 def run3():
-    gyro_soft_calib()
+    #gyro_soft_calib()
+    # Start from the base.
+    # Reset the robot arms.
+    run_parallel(resetleftmediummotor, resetrightmediummotor)
     # Rotate towards Craft creator mission
     gyrospinturn(62, 150)
     # Move forward to close the pink panel of 3D printer
-    accDecGems(3.6,30,300,0.3,0.3)
+    accDecGems(3.6,30,350,0.3,0.3)
     # Rotate left to avoid AR model
     gyrospinturn(-60, 150)
     # Move away from AR model
-    accDecGems(1.5,30,300,0.3,0.3)
+    accDecGems(1.5,30,350,0.3,0.3)
     # Rotate right towards Master piece destination
     gyrospinturn(36, 150)
     # Move and deliver the audience and expert at the Masterpiece destination
-    accDecGems(1.35,30,250,0.3,0.3)
+    accDecGems(1.35,30,350,0.3,0.3)
     # Return to base
     # Go backward to deliver the items 
-    accDecGems(-1.3,30,250,0.3,0.3)
+    simplemovestraight(-1.30,350)
     # Rotate left to face robot back towards wall
-    gyrospinturn(-37,150)
+    gyrospinturn(-37,350)
     # Go backwards till robot is in line with base
-    accDecGems(-1.8,30,250,0.3,0.3)
+    simplemovestraight(-1.8, 400)
     # Rotate right towards base 
-    gyrospinturn(68,150)
+    gyrospinturn(68,350)
     # Move backward to base
-    simplemovestraight(-3.75,300)
+    simplemovestraight(-3.75,500)
     robot.stop()
 
 #********* End of Run 3 *********
@@ -690,6 +691,7 @@ def run3():
 def run4():
     gyro_soft_calib()
     # Start from the base
+    # Reset the robot arms.
     run_parallel(resetleftmediummotor, resetrightmediummotor)
     # Rotate towards the aligning line near music concert mission
     gyrospinturn(69, 150)
