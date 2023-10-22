@@ -716,11 +716,11 @@ def run4():
     left_medium_motor.run_time(350,600, Stop.BRAKE, True)
     # Bring down the left arm at level of middle of vertical part of the lever
     left_medium_motor.reset_angle(0)
-    left_medium_motor.run_target(150, -87, Stop.BRAKE, True)
+    left_medium_motor.run_target(150, -84, Stop.BRAKE, True)
     # Rotate robot left to continue activating the speaker lever
     gyrospinturn(-7,100)
     # Lower the left arm down to continue activating the speaker lever by pushing it down
-    left_medium_motor.run_time(-150, 300, Stop.BRAKE, True)
+    left_medium_motor.run_time(-150, 400, Stop.BRAKE, True)
     # Move backward little bit to avoid left arm getting stuck at the orange lever when left arm is reset
     simplemovestraight(-0.1,150)
     # Mission complete. Reset the left arm.
@@ -728,11 +728,11 @@ def run4():
 
     # *** Mission : Music Concert : Hologram Performer ***
     # Move forward to move the orange panel forward open the hologram performer
-    simplemovestraight(0.65,150)
+    simplemovestraight(0.7,150)
 
     # *** Mission : Music Concert : Lights ***
     # Move backwards to give room for ratating the left arm to activate the lights lever
-    simplemovestraight(-0.1,150)
+    simplemovestraight(-0.3,150)
     # Rotate to position the left arm to prepare for activating the lights lever
     gyrospinturn(37,150)
     # Lower the left arm on the lights beam
@@ -745,7 +745,7 @@ def run4():
     # *** Mission: Expert Delivery 4 - Delivering Stage Manager in the movie set destination ***
     # Rotate left and move backward as preparation for align to black
     gyrospinturn(-77.5,150)
-    simplemovestraight(-0.75,150)
+    simplemovestraight(-0.60,150)
     # Align to black
     aligntoblack()
     # Rotate left to position back of the robot towards the right home area
@@ -755,7 +755,7 @@ def run4():
     # Rotate towards the light show
     gyrospinturn(-90, 150)
     # Move to towards the light show to position the robot to turn to the movie set destination.
-    accDecGems(3.3,30,300,0.3,0.3)
+    accDecGems(3.3,30,450,0.3,0.3)
     # Move till the black line to make the robot consistenly come to this place.
     gems2blackfwd(0.95, 0.05, 100, 4)
     # Move backward little bit avoid hitting light show while rotating left towards the movie set
@@ -781,7 +781,7 @@ def run4():
     # Move towards the movie set rail
     simplemovestraight(1.1, 150)
     # Lower the right arm to place the right arm on the movie set orange lever
-    right_medium_motor.run_time(-200, 750, Stop.BRAKE, True)
+    right_medium_motor.run_time(-200, 650, Stop.BRAKE, True)
     # Rotate the robot right to bring the movie set orange lever down
     gyrospinturn(7,150) 
 
@@ -813,8 +813,6 @@ def run4():
     simplemovestraight(1.45, 200)
     # Final reset of robot to avoid touching the boat
     simplemovestraight(-0.5, 200)
-    
-
     robot.stop()
 
 def test():
