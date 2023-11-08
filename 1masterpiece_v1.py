@@ -505,22 +505,6 @@ def run2(color = 1):
     
     # Start from the base
     run_parallel(resetleftmediummotor, resetrightmediummotor)
-
-    #*** Mission: Rolling Camera - 1: Push the orange lever down (Preparation for rolling camera) ***
-    # Move forward towards the rolling camera orange lever
-    accDecGems(2.75,30,400,0.3,0.3)
-    # Rotate right slightly to aling the right robot arm just above the orange lever
-    gyrospinturn(9, 150)
-    # Lower down the right robot arm to push down the orange leverl down
-    right_medium_motor.run_time(-350,400, Stop.BRAKE, True)
-    # Rotate left to bring back the robot to old direction
-    gyrospinturn(-9, 150)
-    # Go backwards to keep the robot in line with the theater scene change mission
-    # and raise up the robot right arm simultaneously
-    def movebackfromrollingcamera1():
-        accDecGems(-2.75,30,400,0.3,0.3)
-    run_parallel(resetrightmediummotor, movebackfromrollingcamera1)
-
     # Rotate towards the aligning line near theater scene change mission
     gyrospinturn(-70, 150)
     # Move straight to the aligning line
@@ -708,7 +692,7 @@ def run4():
     # Rotate towards the aligning line near music concert mission
     gyrospinturn(69, 150)
     # Move straight to the aligning line
-    accDecGems(2.70,30,400,0.3,0.3)
+    accDecGems(2.70,30,450,0.3,0.3)
     gems2blackfwd(0.95,0.05, 100, 4)
     # Prepare to aligning to black line
     gyrospinturn(40,150)
@@ -765,42 +749,69 @@ def run4():
     # Move to right home area and stop in place to align the robot inline light show
     accDecGems(-2.4,30,300,0.3,0.3)
     # Rotate towards the light show
-    gyrospinturn(-91, 150)
-    
-    #*** Mission: Rolling Camera ****
-    # Move to towards the light show till the left arm is in line with the rolling camera
-    accDecGems(2.1,30,300,0.3,0.3)
-    # Rotate left towards the rolling camera
-    gyrospinturn(-74, 150)
-    # Lower right arm down to place right arm behind the rolling camera
-    left_medium_motor.reset_angle(0)
-    left_medium_motor.run_target(200, -96, Stop.BRAKE, True)
-    # Rotate right to move the rolling camera beyond the chasm.
-    # At the end of the rotation the left robot arm moves the back of the
-    # boat to position the back facing the robot
-    gyrospinturn(42, 150)
-
-    #*** Mission: Movie set - Push the boat
-    # Raise the left robot arm to its reset position and move robot forward
-    # simultaneously to move the robot forward to push the boat beyond black line
-    def movefwdpushboat():
-        simplemovestraight(1.3, 150)
-    run_parallel(resetleftmediummotor, movefwdpushboat)
-
-    # *** Mission: Expert Delivery 4 - Delivering Stage Manager in the movie set destination ***
-    # Rotate right slightly to position the stage manager on the destination
-    gyrospinturn(12, 150)
+    gyrospinturn(-90, 150)
+    # Move to towards the light show to position the robot to turn to the movie set destination.
+    accDecGems(3.3,30,450,0.3,0.3)
+    # Move till the black line to make the robot consistenly come to this place.
+    gems2blackfwd(0.95, 0.05, 100, 4)
+    # Move backward little bit avoid hitting light show while rotating left towards the movie set
+    # destination (next step)
+    simplemovestraight(-0.23, 100)
+    # Turn towards the movie set destination area
+    gyrospinturn(-66, 150)
+    # Move forward to correct position to place the stage manager
+    simplemovestraight(0.5, 150)
     # Lower arm to drop stage manager in movie set destination
     right_medium_motor.reset_angle(0)
     right_medium_motor.run_target(100, -75, Stop.BRAKE, True)
     # After dropping the stage manager move backward to deliver the stage manager
     simplemovestraight(-0.5, 150)
-    # Reset the right robot arm to its reset position
-    resetrightmediummotor()
 
+    # *** Mission: Movie set - 1 (Lifting orange lever) ***
+    # Rotate right to position the right arm in line with the movie set orange lever
+    def rotatetomoviesetlever():
+        gyrospinturn(10, 150)
+    def ramoveupmovieset():
+        right_medium_motor.run_time(300,1000, Stop.BRAKE, False)
+    run_parallel(rotatetomoviesetlever, ramoveupmovieset)
+    # Move towards the movie set rail
+    simplemovestraight(1.1, 150)
+    # Lower the right arm to place the right arm on the movie set orange lever
+    right_medium_motor.run_time(-200, 650, Stop.BRAKE, True)
+    # Rotate the robot right to bring the movie set orange lever down
+    gyrospinturn(7,150) 
+
+    # *** Mission: Movie set - 2 (Pushing the boat) ***
+    # *** Mission: Rolling camera ***
+    # Move back and reset the right arm simultaneously
+    def movebackwardmovieset():
+       simplemovestraight(-1.05,200) 
+    run_parallel(movebackwardmovieset, resetrightmediummotor)
+    # Rotate left to make back of the robot face the east wall.
+    gyrospinturn(41,150)
+    # Move backward till the robot arms are in line with the rolling camera and back of the boat.
+    simplemovestraight(-1, 150)
+    # Roate left to align left arm on top of the rolling camera and right arm behind the boat
+    gyrospinturn(-81, 150)
+    # Bring both arms down to position to move rolling camera and boat to roate in the next manuver.
+    def lowerradownrollingcamera():
+       right_medium_motor.reset_angle(0)
+       right_medium_motor.run_target(200, -100, Stop.BRAKE, True)
+    def lowerladownrollingcamera():
+        left_medium_motor.reset_angle(0)
+        left_medium_motor.run_target(200, -96, Stop.BRAKE, True) 
+    run_parallel(lowerladownrollingcamera, lowerradownrollingcamera)
+    # Rotate right to move the rolling camera beyond the chasm and move the boat beyond the black line
+    # simultaneously
+    gyrospinturn(42, 150) 
+    # Move forward to push the boat in the destination area
+    run_parallel(resetleftmediummotor, resetrightmediummotor)
+    simplemovestraight(1.45, 200)
+    # Final reset of robot to avoid touching the boat
+    simplemovestraight(-0.5, 200)
     robot.stop()
 
- #********* End of Run 3 *********   
+ #********* End of Run 4 *********   
 
 def test():
     simplemovestraight(0.5, 150)
