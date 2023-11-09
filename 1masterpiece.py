@@ -125,7 +125,18 @@ except OSError as ex:
     wait(3000)
 
 # Instantiate the drive base.
-robot = DriveBase(left_motor, right_motor, wheel_diameter=56, axle_track=120)
+try:
+    robot = DriveBase(left_motor, right_motor, wheel_diameter=56, axle_track=120)
+except OSError as ex:
+    # OSError was raised
+    ev3.screen.print("DriveBase: OSError {}".format(ex.args[0]))
+    ev3.speaker.beep()
+    wait(3000)
+except ValueError as ex:
+    # ValueError was raised
+    ev3.screen.print("DriveBase: ValuleError {}".format(ex.args[0]))
+    ev3.speaker.beep()
+    wait(3000)
 
 # Light reading value normalization to 0-100%
 # Light value raw value to % mapping (for white (100%), blacn (0%) 45%, 55% and 50%)
@@ -134,7 +145,7 @@ try:
 except:
     ev3.screen.print("lval.txt does not \nexist!. \nPlease do light \nreading!")
     ev3.speaker.beep()
-    wait(10000)
+    wait(3000)
     exit
 
 line = infile.readline()
@@ -508,9 +519,9 @@ def run2(color = 1):
 
     #*** Mission: Rolling Camera - 1: Push the orange lever down (Preparation for rolling camera) ***
     # Move forward towards the rolling camera orange lever
-    accDecGems(2.75,30,400,0.3,0.3)
+    accDecGems(2.75,30,350,0.3,0.3)
     # Rotate right slightly to aling the right robot arm just above the orange lever
-    gyrospinturn(9, 150)
+    gyrospinturn(8, 150)
     # Lower down the right robot arm to push down the orange leverl down
     right_medium_motor.run_time(-350,400, Stop.BRAKE, True)
     # Rotate left to bring back the robot to old direction
@@ -520,15 +531,15 @@ def run2(color = 1):
     def movebackfromrollingcamera1():
         accDecGems(-2.75,30,350,0.3,0.3)
     run_parallel(resetrightmediummotor, movebackfromrollingcamera1)
-    wait(500)
+    wait(200)
 
     # Rotate towards the aligning line near theater scene change mission
-    gyrospinturn(-70, 150)
+    gyrospinturn(-71, 150)
     # Move straight to the aligning line
-    accDecGems(2.75,30,400,0.3,0.3)
+    accDecGems(2.75,30,350,0.3,0.3)
     gems2blackfwd(0.95,0.05, 100, 1)
     # Prepare to aligning to black line
-    gyrospinturn(-40,150)
+    gyrospinturn(-41,150)
     simplemovestraight(0.25,100)
     # Align to black line (near theater scene change mission)
     aligntoblack()
@@ -537,7 +548,7 @@ def run2(color = 1):
     # Move back a little to give room for the right arm when brought down
     simplemovestraight(-0.25,100)
     def rotatetostagemanager():
-        gyrospinturn(9,150)
+        gyrospinturn(8.3,150)
     def ramovedowntoexpert():
         right_medium_motor.reset_angle(0)
         right_medium_motor.run_target(200, -76, Stop.BRAKE, False)
@@ -558,13 +569,13 @@ def run2(color = 1):
     # Adjust the angle of the lancer to activate the organge lever
     gyrospinturn(17,150)
     # Move forward and backward to activate the orange lever to change the scene once (to change to pink)
-    simplemovestraight(0.3,150)
-    simplemovestraight(-0.3,150)
+    simplemovestraight(0.35,150)
+    simplemovestraight(-0.35,150)
 
     # If Orange is chosen, activate the orange lever one more time to change the scene to orange.
     if color==2:
-        simplemovestraight(0.3,150)
-        simplemovestraight(-0.3,150)
+        simplemovestraight(0.35,150)
+        simplemovestraight(-0.35,150)
 
     # Prepare for align to black again to reset the errors created due to shacking of the robot while 
     # performing theater scene change mission
@@ -576,9 +587,9 @@ def run2(color = 1):
     # *** Mission: Immersive Experience ***
     # Spin rotate towards the immersive experience mission such that the left arm is in line with
     # the orange lever
-    gyrospinturn(116, 150)
+    gyrospinturn(117, 150)
     #Move forward to the immersive experience mission
-    accDecGems(1.42,30,250,0.3,0.3)
+    accDecGems(1.4,30,250,0.3,0.3)
     # Lower the left arm fast till it touches the orange lever
     left_medium_motor.reset_angle(0)
     left_medium_motor.run_target(350,-90, Stop.BRAKE, True)
@@ -590,7 +601,7 @@ def run2(color = 1):
 
     # *** Expert delivery - 2 (Collecting sound engineer)
     # Move forward little bit so that robot will not hit sound mixer in the rotation done below
-    simplemovestraight(0.4,150)
+    simplemovestraight(0.42,150)
     # Rotate towards the sound engineer. The right arm is in line with the loop of the sound engineer
     gyrospinturn(97,150)
     # Bring the right arm to pickup the sound engineer
@@ -615,11 +626,11 @@ def run2(color = 1):
     # Lower the left arm. The left arm is touching the floor, just left to the orange activator
     left_medium_motor.run_time(-350,500, Stop.BRAKE, True)
     # Rotate clockwise to activate the orange lever
-    gyrospinturn(25,200)
+    gyrospinturn(27,200)
     # Continue activating the orange lever by pushing foward from this point onwards
     simplemovestraight(0.6,150)
     # Complete the activating the orange lever by pushing sideways left
-    gyrospinturn(-10,150)
+    gyrospinturn(-12,150)
     
     # *** Mission: Craft Creater - 1 (Opening the Printer) ***
     # Rotate towards VR craft createor mission
@@ -630,20 +641,20 @@ def run2(color = 1):
     left_medium_motor.reset_angle(0)
     left_medium_motor.run_target(350,-87, Stop.BRAKE, True)
     # Move the robot left arm under the 3D printer's orange lid
-    simplemovestraight(0.49,150)
+    simplemovestraight(0.5,150)
     # Lift the lid up
     left_medium_motor.run_time(200,1000, Stop.BRAKE, True)
 
     # *** Mission: Expert Delivery - 3 (Delivering Sound engineer) ***
     # Rotate left slightly to prepare to move towards the music concert destination area
-    gyrospinturn(-61, 150)
-    # Move towards the music concert delivery area and rest the left arm so tht left arm does 
+    gyrospinturn(-55, 150)
+    # Move towards the music concert delivery area and reset the left arm so tht left arm does 
     # not hit the wall
     def movetosoundengineerdestination():
-        accDecGems(1.55,30,250,0.3,0.3)
+        accDecGems(1.6,30,350,0.3,0.3)
     run_parallel(resetleftmediummotor, movetosoundengineerdestination)
     # Rotate left to make the expert delivery carrier in line with the music concert destination area
-    gyrospinturn(-55, 150)
+    gyrospinturn(-62, 150)
     # Move straight to position sound engineer such that when right arm is lowered the sound engnieer is
     # placed in the music concert delivery area.
     simplemovestraight(0.45, 150)
@@ -656,7 +667,7 @@ def run2(color = 1):
     # floor
     right_medium_motor.run_time(150,1500, Stop.BRAKE, False)
     # Turn and towards right launch area and return to right home
-    gyrospinturn(112, 350)
+    gyrospinturn(113, 350)
     simplemovestraight(4, 500)
     robot.stop()
     
@@ -709,7 +720,7 @@ def run4():
     # Rotate towards the aligning line near music concert mission
     gyrospinturn(69, 150)
     # Move straight to the aligning line
-    accDecGems(2.70,30,400,0.3,0.3)
+    accDecGems(2.70,30,350,0.3,0.3)
     gems2blackfwd(0.95,0.05, 100, 4)
     # Prepare to aligning to black line
     gyrospinturn(40,150)
@@ -755,7 +766,7 @@ def run4():
     # Reset the left arm
     left_medium_motor.run_time(350,500, Stop.BRAKE, True)
 
-    # *** Mission: Expert Delivery 4 - Delivering Stage Manager in the movie set destination ***
+    #*** Mission: Rolling Camera ****
     # Rotate left and move backward as preparation for align to black
     gyrospinturn(-77.5,150)
     simplemovestraight(-0.60,150)
@@ -764,15 +775,17 @@ def run4():
     # Rotate left to position back of the robot towards the right home area
     gyrospinturn(-47,150)
     # Move to right home area and stop in place to align the robot inline light show
-    accDecGems(-2.4,30,300,0.3,0.3)
+    accDecGems(-2.4,30,350,0.3,0.3)
     # Rotate towards the light show
     gyrospinturn(-91, 150)
     
-    #*** Mission: Rolling Camera ****
     # Move to towards the light show till the left arm is in line with the rolling camera
-    accDecGems(2.1,30,300,0.3,0.3)
+    accDecGems(2.1,30,350,0.3,0.3)
     # Rotate left towards the rolling camera
     gyrospinturn(-76, 150)
+    # Move forward little bit to so that the enough left arm will be behind the rolling camera
+    # when the arm is lowered down
+    simplemovestraight(0.1, 150)
     # Lower right arm down to place right arm behind the rolling camera
     left_medium_motor.reset_angle(0)
     left_medium_motor.run_target(200, -96, Stop.BRAKE, True)
@@ -804,9 +817,12 @@ def run4():
  #********* End of Run 4 *********       
 
 def test():
-    simplemovestraight(0.5, 150)
-    gyrospinturn(35, 150)
+    """gyrospinturn(90, 150)
     robot.stop()
+    ga = gyro.angle()
+    ev3.screen.print("Gyro Angle: {}".format(ga))
+    wait(3000)"""
+    gems2blackfwd(0.95, 0.05, 100, 1)
 
 #****************************************************
 # Main program loop starts here
