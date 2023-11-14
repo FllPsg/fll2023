@@ -474,11 +474,11 @@ def run1():
     gyrospinturn(-100, 200)
     run_parallel(moveto3dexp,lamovedown_3dc)
     #Align to model (3D cenima)
-    gyrospinturn(-11, 150)
+    gyrospinturn(-7, 150)
     
     simplemovestraight(0.2,100)
     # Rotate right to over dragon to complete 3D Cinema mission
-    gyrospinturn(11,150)
+    gyrospinturn(12,150)
     
     # *** Mission: Audience Delivery - 1 (Destination: 3D Cenima) ***
     def lamoveup_ad1():
@@ -491,7 +491,7 @@ def run1():
     simplemovestraight(-0.6, 120)
     
     # *** Mission: Audience Delivery - 2 (Destination: Skateboard area) ***
-    gyrospinturn(37, 150)
+    gyrospinturn(36, 150)
     # Move towards the skateboard area (the audience id moved to the skateboard area)
     accDecGems(3.4,30,450,0.3,0.3)
     # Move backward slightly to clear way for the audience to be delivered in the next step
@@ -534,7 +534,7 @@ def run2(color = 1):
     wait(200)
 
     # Rotate towards the aligning line near theater scene change mission
-    gyrospinturn(-71, 150)
+    gyrospinturn(-70, 150)
     # Move straight to the aligning line
     accDecGems(2.75,30,350,0.3,0.3)
     gems2blackfwd(0.95,0.05, 100, 1)
@@ -587,7 +587,7 @@ def run2(color = 1):
     # *** Mission: Immersive Experience ***
     # Spin rotate towards the immersive experience mission such that the left arm is in line with
     # the orange lever
-    gyrospinturn(117, 150)
+    gyrospinturn(114, 150)
     #Move forward to the immersive experience mission
     accDecGems(1.4,30,250,0.3,0.3)
     # Lower the left arm fast till it touches the orange lever
@@ -603,7 +603,7 @@ def run2(color = 1):
     # Move forward little bit so that robot will not hit sound mixer in the rotation done below
     simplemovestraight(0.42,150)
     # Rotate towards the sound engineer. The right arm is in line with the loop of the sound engineer
-    gyrospinturn(97,150)
+    gyrospinturn(99,150)
     # Bring the right arm to pickup the sound engineer
     right_medium_motor.reset_angle(0)
     right_medium_motor.run_target(150, -75, Stop.BRAKE, True)
@@ -630,18 +630,18 @@ def run2(color = 1):
     # Continue activating the orange lever by pushing foward from this point onwards
     simplemovestraight(0.6,150)
     # Complete the activating the orange lever by pushing sideways left
-    gyrospinturn(-12,150)
+    gyrospinturn(-10,150)
     
     # *** Mission: Craft Creater - 1 (Opening the Printer) ***
     # Rotate towards VR craft createor mission
-    gyrospinturn(57,150)
+    gyrospinturn(58,150)
     # Reset the left arm
     left_medium_motor.run_time(350,500, Stop.BRAKE, True)
     # Bring up the left arm to level with the organge lid of the 3D printer
     left_medium_motor.reset_angle(0)
     left_medium_motor.run_target(350,-87, Stop.BRAKE, True)
     # Move the robot left arm under the 3D printer's orange lid
-    simplemovestraight(0.5,150)
+    simplemovestraight(0.58,150)
     # Lift the lid up
     left_medium_motor.run_time(200,1000, Stop.BRAKE, True)
 
@@ -683,15 +683,15 @@ def run3():
     # Reset the robot arms.
     run_parallel(resetleftmediummotor, resetrightmediummotor)
     # Rotate towards Craft creator mission
-    gyrospinturn(62, 150)
+    gyrospinturn(63, 150)
     # Move forward to close the pink panel of 3D printer
     accDecGems(3.6,30,350,0.3,0.3)
     # Rotate left to avoid AR model
-    gyrospinturn(-60, 150)
+    gyrospinturn(-61, 150)
     # Move away from AR model
     accDecGems(1.5,30,350,0.3,0.3)
     # Rotate right towards Master piece destination
-    gyrospinturn(36, 150)
+    gyrospinturn(37, 150)
     # Move and deliver the audience and expert at the Masterpiece destination
     accDecGems(1.35,30,350,0.3,0.3)
     # Return to base
@@ -704,7 +704,7 @@ def run3():
     # Rotate right towards base 
     gyrospinturn(68,350)
     # Move backward to base
-    simplemovestraight(-3.75,500)
+    simplemovestraight(-3.9,500)
     robot.stop()
 
 #********* End of Run 3 *********
@@ -777,12 +777,12 @@ def run4():
     # Move to right home area and stop in place to align the robot inline light show
     accDecGems(-2.4,30,350,0.3,0.3)
     # Rotate towards the light show
-    gyrospinturn(-91, 150)
+    gyrospinturn(-92, 150)
     
     # Move to towards the light show till the left arm is in line with the rolling camera
     accDecGems(2.1,30,350,0.3,0.3)
     # Rotate left towards the rolling camera
-    gyrospinturn(-76, 150)
+    gyrospinturn(-80, 150)
     # Move forward little bit to so that the enough left arm will be behind the rolling camera
     # when the arm is lowered down
     simplemovestraight(0.1, 150)
@@ -798,7 +798,7 @@ def run4():
     # Raise the left robot arm to its reset position and move robot forward
     # simultaneously to move the robot forward to push the boat beyond black line
     def movefwdpushboat():
-        simplemovestraight(1.4, 150)
+        simplemovestraight(1.5, 150)
     run_parallel(resetleftmediummotor, movefwdpushboat)
 
     # *** Mission: Expert Delivery 4 - Delivering Stage Manager in the movie set destination ***
