@@ -463,7 +463,7 @@ def run1():
     
     def lamovedown_3dc():
         left_medium_motor.reset_angle(0)
-        left_medium_motor.run_target(200,-68.5, Stop.BRAKE)
+        left_medium_motor.run_target(200,-69, Stop.BRAKE)
 
     #Initialize devices initial positions
     left_medium_motor.stop()
@@ -491,9 +491,9 @@ def run1():
     simplemovestraight(-0.6, 120)
     
     # *** Mission: Audience Delivery - 2 (Destination: Skateboard area) ***
-    gyrospinturn(36, 150)
+    gyrospinturn(32, 150)
     # Move towards the skateboard area (the audience id moved to the skateboard area)
-    accDecGems(3.4,30,450,0.3,0.3)
+    accDecGems(3.3,30,450,0.3,0.3)
     # Move backward slightly to clear way for the audience to be delivered in the next step
     simplemovestraight(-0.4,100)
     gyrospinturn(-20, 100)
@@ -529,18 +529,18 @@ def run2(color = 1):
     # Go backwards to keep the robot in line with the theater scene change mission
     # and raise up the robot right arm simultaneously
     def movebackfromrollingcamera1():
-        accDecGems(-2.75,30,350,0.3,0.3)
+        accDecGems(-2.74,30,350,0.3,0.3)
     run_parallel(resetrightmediummotor, movebackfromrollingcamera1)
     wait(200)
 
     # Rotate towards the aligning line near theater scene change mission
-    gyrospinturn(-70, 150)
+    gyrospinturn(-69.5, 150)
     # Move straight to the aligning line
     accDecGems(2.75,30,350,0.3,0.3)
-    gems2blackfwd(0.95,0.05, 100, 1)
+    gems2blackfwd(0.9,0.1, 100, 1)
     # Prepare to aligning to black line
     gyrospinturn(-41,150)
-    simplemovestraight(0.25,100)
+    simplemovestraight(0.23,100)
     # Align to black line (near theater scene change mission)
     aligntoblack()
 
@@ -548,7 +548,7 @@ def run2(color = 1):
     # Move back a little to give room for the right arm when brought down
     simplemovestraight(-0.25,100)
     def rotatetostagemanager():
-        gyrospinturn(8.3,150)
+        gyrospinturn(8.2,150)
     def ramovedowntoexpert():
         right_medium_motor.reset_angle(0)
         right_medium_motor.run_target(200, -76, Stop.BRAKE, False)
@@ -596,7 +596,7 @@ def run2(color = 1):
     # Lower the left arm again fast so that the entire force is used to lower the lever
     left_medium_motor.run_time(-450,1500, Stop.BRAKE, True)
     # Raise the left arm to complete the mission.
-    left_medium_motor.run_time(350,500, Stop.BRAKE, True)
+    left_medium_motor.run_time(350,750, Stop.BRAKE, True)
     #gyro_soft_calib()
 
     # *** Expert delivery - 2 (Collecting sound engineer)
@@ -626,7 +626,7 @@ def run2(color = 1):
     # Lower the left arm. The left arm is touching the floor, just left to the orange activator
     left_medium_motor.run_time(-350,500, Stop.BRAKE, True)
     # Rotate clockwise to activate the orange lever
-    gyrospinturn(27,200)
+    gyrospinturn(29,200)
     # Continue activating the orange lever by pushing foward from this point onwards
     simplemovestraight(0.6,150)
     # Complete the activating the orange lever by pushing sideways left
@@ -636,12 +636,12 @@ def run2(color = 1):
     # Rotate towards VR craft createor mission
     gyrospinturn(58,150)
     # Reset the left arm
-    left_medium_motor.run_time(350,500, Stop.BRAKE, True)
+    left_medium_motor.run_time(350,750, Stop.BRAKE, True)
     # Bring up the left arm to level with the organge lid of the 3D printer
     left_medium_motor.reset_angle(0)
-    left_medium_motor.run_target(350,-87, Stop.BRAKE, True)
+    left_medium_motor.run_target(350,-91, Stop.BRAKE, True)
     # Move the robot left arm under the 3D printer's orange lid
-    simplemovestraight(0.58,150)
+    simplemovestraight(0.59,150)
     # Lift the lid up
     left_medium_motor.run_time(200,1000, Stop.BRAKE, True)
 
@@ -721,7 +721,7 @@ def run4():
     gyrospinturn(69, 150)
     # Move straight to the aligning line
     accDecGems(2.70,30,350,0.3,0.3)
-    gems2blackfwd(0.95,0.05, 100, 4)
+    gems2blackfwd(0.9,0.1, 100, 4)
     # Prepare to aligning to black line
     gyrospinturn(40,150)
     simplemovestraight(0.25,100)
