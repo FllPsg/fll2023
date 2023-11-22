@@ -322,6 +322,55 @@ def accDecGems(total_dist, start_speed = 30, top_speed = 300, acc_dist=0.2, dec_
             LogMsg("Speed: {}, Distance: {}, Error: {}".format(drive_speed, current_dist, gyro_error))
         wait(10)
 
+def accDecGemsPID(total_dist, start_speed = 30, top_speed = 300, acc_dist=0.2, dec_dist=0.2, Kp=1, Ki=0.3, Kd=0.5):
+    """ Acceleration/Deceleration Drive with variable acceleration
+        Parameters:
+            total_dist = The total target distance. Given in number of rotations.
+                        Negative distance is for backward direction
+            start_speed = Starting speed
+            top_speed = The top speed (curising speed after raising acceleration)
+            acc_dist = The distance from the starting posion, how far the acceleration is done
+                    At the end of this distance, the cruising will start (no acceleration)
+                    This is distance from start as % of total_distance
+            dec_dist = Deceleration distance. The distance from the end how far deceleration should be one
+                    This is given % of total_distance.
+    """
+    #Proportional factor for PID
+    kp = Kp
+    ki = Ki
+    kd = Kd
+
+    error_last = 0
+    error_d = 0
+    error_i = 0
+
+    gyro.reset_angle(0)
+    left_motor.reset_angle(0)
+    right_motor.reset_angle(0)
+    #Convert distance in rotation to distance in angle and set the direction
+    direction = 1
+    if total_dist < 0:
+        direction = -1
+    total_dist = abs(total_dist*360)
+
+    while True:
+        current_dist = abs(left_motor.angle())
+        if current_dist >= total_dist:
+            robot_stop()
+            break
+        else:
+            drive_speed = calc_var_acc_speed(current_dist/total_dist, acc_dist, dec_dist, start_speed, top_speed)
+            gyro_error = 0-(gyro.angle())
+
+            error_d = gyro_error - error_last
+            error_i = error_i + gyro_error
+            error_last = gyro_error
+
+            correction = (gyro_error * kp) + (error_i * ki) + (error_d * kd)
+            robot.drive(drive_speed*direction, correction)
+            LogMsg("Speed: {}, Distance: {}, Error: {}".format(drive_speed, current_dist, gyro_error))
+        wait(10)
+
 def gems(rotations,speed):
     gyro.reset_angle(0)
     left_motor.reset_angle(0)
@@ -510,7 +559,7 @@ def run1():
 # ***********************************************
 def run2(color = 1):
     #Initialization
-    #gyro_soft_calib()
+    gyro_soft_calib()
     left_medium_motor.stop()
     right_medium_motor.stop()
     
@@ -525,16 +574,21 @@ def run2(color = 1):
     # Lower down the right robot arm to push down the orange leverl down
     right_medium_motor.run_time(-350,400, Stop.BRAKE, True)
     # Rotate left to bring back the robot to old direction
-    gyrospinturn(-12, 150)
+    gyrospinturn(-8, 150)
     # Go backwards to keep the robot in line with the theater scene change mission
     # and raise up the robot right arm simultaneously
-    def movebackfromrollingcamera1():
-        accDecGems(-2.74,30,350,0.3,0.3)
-    run_parallel(resetrightmediummotor, movebackfromrollingcamera1)
+    # Running medium motors and functions using gyro creates problem since
+    # running medium motor shakes the robot. Avoid running medium motors and functions
+    # using gyro
+    #def movebackfromrollingcamera1():
+    #    accDecGems(-2.74,30,350,0.3,0.3)
+    #run_parallel(resetrightmediummotor, movebackfromrollingcamera1)
+    right_medium_motor.run_time(350,500, Stop.BRAKE, True)
+    accDecGems(-2.74,30,350,0.3,0.3)
     wait(200)
 
     # Rotate towards the aligning line near theater scene change mission
-    gyrospinturn(-69.5, 150)
+    gyrospinturn(-70.5, 150)
     # Move straight to the aligning line
     accDecGems(2.75,30,350,0.3,0.3)
     gems2blackfwd(0.9,0.1, 100, 1)
@@ -547,14 +601,19 @@ def run2(color = 1):
     # *** Mission Expert delivery - 1 (Stage manager collection) ***
     # Move back a little to give room for the right arm when brought down
     simplemovestraight(-0.25,100)
-    def rotatetostagemanager():
-        gyrospinturn(8.2,150)
-    def ramovedowntoexpert():
-        right_medium_motor.reset_angle(0)
-        right_medium_motor.run_target(200, -76, Stop.BRAKE, False)
     # Rotate the robot to position aligning towards the stage manager and bring the right arm down
     # simultaneously
-    run_parallel(rotatetostagemanager, ramovedowntoexpert)
+    # Avoid operating medium motors and gyro parallelly
+    #def rotatetostagemanager():
+    #    gyrospinturn(8.2,150)
+    #def ramovedowntoexpert():
+    #    right_medium_motor.reset_angle(0)
+    #    right_medium_motor.run_target(200, -76, Stop.BRAKE, False)
+    #run_parallel(rotatetostagemanager, ramovedowntoexpert)
+    gyrospinturn(8,150)
+    right_medium_motor.reset_angle(0)
+    right_medium_motor.run_target(200, -76, Stop.BRAKE, True)
+
     # Move straight into the loop of the stage manager
     simplemovestraight(0.5,100)
     def movebackfromstagemanager():
@@ -603,12 +662,12 @@ def run2(color = 1):
     # Move forward little bit so that robot will not hit sound mixer in the rotation done below
     simplemovestraight(0.42,150)
     # Rotate towards the sound engineer. The right arm is in line with the loop of the sound engineer
-    gyrospinturn(99,150)
+    gyrospinturn(99.5,150)
     # Bring the right arm to pickup the sound engineer
     right_medium_motor.reset_angle(0)
     right_medium_motor.run_target(150, -75, Stop.BRAKE, True)
     # Move into the loop of the sound engineer
-    simplemovestraight(0.56,100)
+    simplemovestraight(0.57,100)
     # Pick up sound engineer by lifting the right arm
     right_medium_motor.run_time(100, 750, Stop.BRAKE, True)
     
@@ -678,7 +737,7 @@ def run2(color = 1):
 # Run 3 
 #************************************************
 def run3():
-    #gyro_soft_calib()
+    gyro_soft_calib()
     # Start from the base.
     # Reset the robot arms.
     run_parallel(resetleftmediummotor, resetrightmediummotor)
@@ -713,7 +772,7 @@ def run3():
 # Run 4
 #************************************************
 def run4():
-    #gyro_soft_calib()
+    gyro_soft_calib()
     # Start from the base
     # Reset the robot arms.
     run_parallel(resetleftmediummotor, resetrightmediummotor)
@@ -725,7 +784,7 @@ def run4():
     # Prepare to aligning to black line
     gyrospinturn(40,150)
     simplemovestraight(0.25,100)
-    # Alighn to black line (near music concert mission)
+    # Align to black line (near music concert mission)
     aligntoblack()
 
     # *** Mission: Music Concert : Speaker ***
@@ -821,8 +880,10 @@ def test():
     robot.stop()
     ga = gyro.angle()
     ev3.screen.print("Gyro Angle: {}".format(ga))
-    wait(3000)"""
-    gems2blackfwd(0.95, 0.05, 100, 1)
+    wait(3000)
+    gems2blackfwd(0.95, 0.05, 100, 1)"""
+    accDecGemsPID(9, 30, 350, 0.1, 0.1)
+    robot.stop()
 
 #****************************************************
 # Main program loop starts here
