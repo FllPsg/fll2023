@@ -493,12 +493,12 @@ def get_menu_selection():
 # Helper functions
 #**************************************
 def resetleftmediummotor():
+    left_medium_motor.run_time(350,500, Stop.BRAKE, True)
     left_medium_motor.reset_angle(0)
-    left_medium_motor.run_time(350,1500, Stop.BRAKE, False)
 
 def resetrightmediummotor():
+    right_medium_motor.run_time(350,500, Stop.BRAKE, True)
     right_medium_motor.reset_angle(0)
-    right_medium_motor.run_time(350,1500, Stop.BRAKE, False)
 
 #*************************************
 # Run 1 
@@ -507,13 +507,6 @@ def run1():
     def movefrombase():
         simplemovestraight(0.75,120)
 
-    def moveto3dexp():
-        simplemovestraight(1.1,120)
-    
-    def lamovedown_3dc():
-        left_medium_motor.reset_angle(0)
-        left_medium_motor.run_target(200,-69, Stop.BRAKE)
-
     #Initialize devices initial positions
     left_medium_motor.stop()
     right_medium_motor.stop()
@@ -521,7 +514,11 @@ def run1():
     # *** Mission: 3D Cenima ***
     run_parallel(resetleftmediummotor, resetrightmediummotor, movefrombase)
     gyrospinturn(-100, 200)
-    run_parallel(moveto3dexp,lamovedown_3dc)
+    # Bring the left arm down enough to align with the dragon head
+    left_medium_motor.reset_angle(0)
+    left_medium_motor.run_target(200,-70.5, Stop.BRAKE)
+    # Move towards the 3D cinea
+    simplemovestraight(1.1,120)
     #Align to model (3D cenima)
     gyrospinturn(-7, 150)
     
@@ -544,7 +541,7 @@ def run1():
     # Move towards the skateboard area (the audience id moved to the skateboard area)
     accDecGems(3.3,30,450,0.3,0.3)
     # Move backward slightly to clear way for the audience to be delivered in the next step
-    simplemovestraight(-0.4,100)
+    simplemovestraight(-0.45,100)
     gyrospinturn(-20, 100)
     simplemovestraight(-0.25, 100)
     gyrospinturn(26,150)
@@ -571,24 +568,18 @@ def run2(color = 1):
     accDecGems(2.75,30,350,0.3,0.3)
     # Rotate right slightly to aling the right robot arm just above the orange lever
     gyrospinturn(8, 150)
-    # Lower down the right robot arm to push down the orange leverl down
+    # Lower down the right robot arm to push down the orange 1ever down
     right_medium_motor.run_time(-350,400, Stop.BRAKE, True)
     # Rotate left to bring back the robot to old direction
     gyrospinturn(-8, 150)
-    # Go backwards to keep the robot in line with the theater scene change mission
-    # and raise up the robot right arm simultaneously
-    # Running medium motors and functions using gyro creates problem since
-    # running medium motor shakes the robot. Avoid running medium motors and functions
-    # using gyro
-    #def movebackfromrollingcamera1():
-    #    accDecGems(-2.74,30,350,0.3,0.3)
-    #run_parallel(resetrightmediummotor, movebackfromrollingcamera1)
+    # Reset rigt arm position
     right_medium_motor.run_time(350,500, Stop.BRAKE, True)
+    # Go backwards to keep the robot in line with the theater scene change mission
     accDecGems(-2.74,30,350,0.3,0.3)
     wait(200)
 
     # Rotate towards the aligning line near theater scene change mission
-    gyrospinturn(-70.5, 150)
+    gyrospinturn(-70, 150)
     # Move straight to the aligning line
     accDecGems(2.75,30,350,0.3,0.3)
     gems2blackfwd(0.9,0.1, 100, 1)
@@ -601,16 +592,9 @@ def run2(color = 1):
     # *** Mission Expert delivery - 1 (Stage manager collection) ***
     # Move back a little to give room for the right arm when brought down
     simplemovestraight(-0.25,100)
-    # Rotate the robot to position aligning towards the stage manager and bring the right arm down
-    # simultaneously
-    # Avoid operating medium motors and gyro parallelly
-    #def rotatetostagemanager():
-    #    gyrospinturn(8.2,150)
-    #def ramovedowntoexpert():
-    #    right_medium_motor.reset_angle(0)
-    #    right_medium_motor.run_target(200, -76, Stop.BRAKE, False)
-    #run_parallel(rotatetostagemanager, ramovedowntoexpert)
+    # Rotate the robot to position aligning towards the stage manager
     gyrospinturn(8,150)
+    # Bring the right arm down to align with the stage manager loop
     right_medium_motor.reset_angle(0)
     right_medium_motor.run_target(200, -76, Stop.BRAKE, True)
 
@@ -700,7 +684,7 @@ def run2(color = 1):
     left_medium_motor.reset_angle(0)
     left_medium_motor.run_target(350,-91, Stop.BRAKE, True)
     # Move the robot left arm under the 3D printer's orange lid
-    simplemovestraight(0.59,150)
+    simplemovestraight(0.61,150)
     # Lift the lid up
     left_medium_motor.run_time(200,1000, Stop.BRAKE, True)
 
@@ -710,8 +694,9 @@ def run2(color = 1):
     # Move towards the music concert delivery area and reset the left arm so tht left arm does 
     # not hit the wall
     def movetosoundengineerdestination():
-        accDecGems(1.6,30,350,0.3,0.3)
-    run_parallel(resetleftmediummotor, movetosoundengineerdestination)
+        accDecGems(1.65,30,350,0.3,0.3)
+    resetleftmediummotor()
+    movetosoundengineerdestination()
     # Rotate left to make the expert delivery carrier in line with the music concert destination area
     gyrospinturn(-62, 150)
     # Move straight to position sound engineer such that when right arm is lowered the sound engnieer is
@@ -721,13 +706,13 @@ def run2(color = 1):
     # is left in the destination and the stage manager is still on the right arm.
     right_medium_motor.reset_angle(0)
     right_medium_motor.run_target(100, -75, Stop.BRAKE, True)
-    simplemovestraight(-0.35,150)
+    simplemovestraight(-0.30,150)
     # Raise right arm so that only the stage manager is lifted up but the sound engineer is left on the 
     # floor
     right_medium_motor.run_time(150,1500, Stop.BRAKE, False)
     # Turn and towards right launch area and return to right home
     gyrospinturn(113, 350)
-    simplemovestraight(4, 500)
+    simplemovestraight(4.05, 500)
     robot.stop()
     
 #********* End of Run 2 *********
@@ -841,7 +826,7 @@ def run4():
     # Move to towards the light show till the left arm is in line with the rolling camera
     accDecGems(2.1,30,350,0.3,0.3)
     # Rotate left towards the rolling camera
-    gyrospinturn(-80, 150)
+    gyrospinturn(-76, 150)
     # Move forward little bit to so that the enough left arm will be behind the rolling camera
     # when the arm is lowered down
     simplemovestraight(0.1, 150)
@@ -851,7 +836,7 @@ def run4():
     # Rotate right to move the rolling camera beyond the chasm.
     # At the end of the rotation the left robot arm moves the back of the
     # boat to position the back facing the robot
-    gyrospinturn(42, 150)
+    gyrospinturn(45, 150)
 
     #*** Mission: Movie set - Push the boat
     # Raise the left robot arm to its reset position and move robot forward
