@@ -184,6 +184,29 @@ def gyro_soft_calib():
     #ev3.speaker.beep()
     ev3.light.on(Color.GREEN)
 
+def gyro_del_create():
+    global gyro
+    del gyro
+    try:
+        gyro = GyroSensor(Port.S2, Direction.CLOCKWISE)
+    except OSError as ex:
+        # OSError was raised, check for the kind of error
+        # If no device error (ENODEV), notify on the console
+        if ex.args[0] == uerrno.ENODEV:
+            # ENODEV is short for "Error, no device."
+            ev3.screen.print("Gyro: No device!")
+        else:
+            ev3.screen.print("Gyro: OSError {}".format(ex.args[0]))
+        ev3.speaker.beep()
+        return
+    gyro.reset_angle(0)
+
+    for i in range(3):
+        wait(100)
+        angle = int(gyro.angle())
+        if angle == 0:
+            break
+
 def robot_stop(mode=1):
     robot.stop()
     if mode == 1: 
@@ -556,7 +579,8 @@ def run1():
 # ***********************************************
 def run2(color = 1):
     #Initialization
-    gyro_soft_calib()
+    #gyro_soft_calib()
+    gyro_del_create
     left_medium_motor.stop()
     right_medium_motor.stop()
     
@@ -567,11 +591,11 @@ def run2(color = 1):
     # Move forward towards the rolling camera orange lever
     accDecGems(2.75,30,350,0.3,0.3)
     # Rotate right slightly to aling the right robot arm just above the orange lever
-    gyrospinturn(8, 150)
+    gyrospinturn(10, 150)
     # Lower down the right robot arm to push down the orange 1ever down
     right_medium_motor.run_time(-350,400, Stop.BRAKE, True)
     # Rotate left to bring back the robot to old direction
-    gyrospinturn(-8, 150)
+    gyrospinturn(-10, 150)
     # Reset rigt arm position
     right_medium_motor.run_time(350,500, Stop.BRAKE, True)
     # Go backwards to keep the robot in line with the theater scene change mission
@@ -677,7 +701,7 @@ def run2(color = 1):
     
     # *** Mission: Craft Creater - 1 (Opening the Printer) ***
     # Rotate towards VR craft createor mission
-    gyrospinturn(58,150)
+    gyrospinturn(56,150)
     # Reset the left arm
     left_medium_motor.run_time(350,750, Stop.BRAKE, True)
     # Bring up the left arm to level with the organge lid of the 3D printer
@@ -686,7 +710,7 @@ def run2(color = 1):
     # Move the robot left arm under the 3D printer's orange lid
     simplemovestraight(0.61,150)
     # Lift the lid up
-    left_medium_motor.run_time(200,1000, Stop.BRAKE, True)
+    left_medium_motor.run_time(150,1000, Stop.BRAKE, True)
 
     # *** Mission: Expert Delivery - 3 (Delivering Sound engineer) ***
     # Rotate left slightly to prepare to move towards the music concert destination area
@@ -722,7 +746,8 @@ def run2(color = 1):
 # Run 3 
 #************************************************
 def run3():
-    gyro_soft_calib()
+    #gyro_soft_calib()
+    gyro_del_create
     # Start from the base.
     # Reset the robot arms.
     run_parallel(resetleftmediummotor, resetrightmediummotor)
@@ -757,7 +782,8 @@ def run3():
 # Run 4
 #************************************************
 def run4():
-    gyro_soft_calib()
+    #gyro_soft_calib()
+    gyro_del_create
     # Start from the base
     # Reset the robot arms.
     run_parallel(resetleftmediummotor, resetrightmediummotor)
@@ -789,6 +815,8 @@ def run4():
     gyrospinturn(-7,100)
     # Lower the left arm down to continue activating the speaker lever by pushing it down
     left_medium_motor.run_time(-150, 400, Stop.BRAKE, True)
+    left_medium_motor.reset_angle(0)
+
     # Move backward little bit to avoid left arm getting stuck at the orange lever when left arm is reset
     simplemovestraight(-0.1,150)
     # Mission complete. Reset the left arm.
@@ -796,13 +824,14 @@ def run4():
 
     # *** Mission : Music Concert : Hologram Performer ***
     # Move forward to move the orange panel forward open the hologram performer
-    simplemovestraight(0.67,150)
+    gyrospinturn(8,150)
+    simplemovestraight(0.65,150)
 
     # *** Mission : Music Concert : Lights ***
     # Move backwards to give room for ratating the left arm to activate the lights lever
     simplemovestraight(-0.3,150)
     # Rotate to position the left arm to prepare for activating the lights lever
-    gyrospinturn(37,150)
+    gyrospinturn(27,150)
     # Lower the left arm on the lights beam
     left_medium_motor.run_time(-150,500,Stop.BRAKE, True)
     # Roate the robot right to activate the lights lever.
@@ -822,11 +851,10 @@ def run4():
     accDecGems(-2.4,30,350,0.3,0.3)
     # Rotate towards the light show
     gyrospinturn(-92, 150)
-    
     # Move to towards the light show till the left arm is in line with the rolling camera
     accDecGems(2.1,30,350,0.3,0.3)
     # Rotate left towards the rolling camera
-    gyrospinturn(-76, 150)
+    gyrospinturn(-78, 150)
     # Move forward little bit to so that the enough left arm will be behind the rolling camera
     # when the arm is lowered down
     simplemovestraight(0.1, 150)
@@ -858,7 +886,7 @@ def run4():
 
     robot.stop()
 
- #********* End of Run 4 *********       
+ #********* End of Run 4 *********
 
 def test():
     """gyrospinturn(90, 150)
