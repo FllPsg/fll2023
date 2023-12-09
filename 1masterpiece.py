@@ -832,8 +832,9 @@ def run4():
     simplemovestraight(-0.3,150)
     # Rotate to position the left arm to prepare for activating the lights lever
     gyrospinturn(27,150)
-    # Lower the left arm on the lights beam
-    left_medium_motor.run_time(-150,500,Stop.BRAKE, True)
+    #Lower the left arm on the lights beam
+    left_medium_motor.reset_angle(0)
+    left_medium_motor.run_target(150, -44,Stop.BRAKE, True)
     # Roate the robot right to activate the lights lever.
     gyrospinturn(43,150)
     # Reset the left arm
@@ -854,7 +855,7 @@ def run4():
     # Move to towards the light show till the left arm is in line with the rolling camera
     accDecGems(2.1,30,350,0.3,0.3)
     # Rotate left towards the rolling camera
-    gyrospinturn(-78, 150)
+    gyrospinturn(-74, 150)
     # Move forward little bit to so that the enough left arm will be behind the rolling camera
     # when the arm is lowered down
     simplemovestraight(0.1, 150)
