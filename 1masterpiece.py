@@ -39,6 +39,10 @@ except OSError as ex:
         ev3.screen.print("Left LM: OSError {}".format(ex.args[0]))
     ev3.speaker.beep()
     wait(3000)
+except:
+    ev3.screen.print("Left LM: Other Err!")
+    ev3.speaker.beep()
+    wait(3000)
 
 # Instantiate the right large motor
 try:
@@ -51,6 +55,10 @@ except OSError as ex:
         ev3.screen.print("Right LM: No device!")
     else:
         ev3.screen.print("Right LM: OSError {}".format(ex.args[0]))
+    ev3.speaker.beep()
+    wait(3000)
+except:
+    ev3.screen.print("Right LM: Other Err!")
     ev3.speaker.beep()
     wait(3000)
 
@@ -67,6 +75,10 @@ except OSError as ex:
         ev3.screen.print("Left CS: OSError {}".format(ex.args[0]))
     ev3.speaker.beep()
     wait(3000)
+except:
+    ev3.screen.print("Left CS: Other Err!")
+    ev3.speaker.beep()
+    wait(3000)
 
 # Instantiate right color sensor
 try:
@@ -79,6 +91,10 @@ except OSError as ex:
         ev3.screen.print("Right CS: No device!")
     else:
         ev3.screen.print("Right CS: OSError {}".format(ex.args[0]))
+    ev3.speaker.beep()
+    wait(3000)
+except:
+    ev3.screen.print("Right CS: Other Err!")
     ev3.speaker.beep()
     wait(3000)
 
@@ -95,6 +111,10 @@ except OSError as ex:
         ev3.screen.print("Gyro: OSError {}".format(ex.args[0]))
     ev3.speaker.beep()
     wait(3000)
+except:
+    ev3.screen.print("Gyro: Other Err!")
+    ev3.speaker.beep()
+    wait(3000)
 
 # Instantiate the left medium motor
 try:
@@ -107,6 +127,10 @@ except OSError as ex:
         ev3.screen.print("Left MM: No device!")
     else:
         ev3.screen.print("Left MM: OSError {}".format(ex.args[0]))
+    ev3.speaker.beep()
+    wait(3000)
+except:
+    ev3.screen.print("Left MM: Other Err!")
     ev3.speaker.beep()
     wait(3000)
 
@@ -123,18 +147,28 @@ except OSError as ex:
         ev3.screen.print("Right MM: OSError {}".format(ex.args[0]))
     ev3.speaker.beep()
     wait(3000)
+except:
+    ev3.screen.print("Right MM: Other Err!")
+    ev3.speaker.beep()
+    wait(3000)
 
 # Instantiate the drive base.
 try:
     robot = DriveBase(left_motor, right_motor, wheel_diameter=56, axle_track=120)
 except OSError as ex:
     # OSError was raised
-    ev3.screen.print("DriveBase: OSError {}".format(ex.args[0]))
+    ev3.screen.print("DriveBase: OSErr!")
+    ev3.screen.print("   OSErr: {}".format(ex.args[0]))
     ev3.speaker.beep()
     wait(3000)
 except ValueError as ex:
     # ValueError was raised
-    ev3.screen.print("DriveBase: ValuleError {}".format(ex.args[0]))
+    ev3.screen.print("DriveBase: VErr!")
+    ev3.screen.print("   VErr: {}".format(ex.args[0]))
+    ev3.speaker.beep()
+    wait(3000)
+except:
+    ev3.screen.print("DriveBase: Other Err!")
     ev3.speaker.beep()
     wait(3000)
 
@@ -186,6 +220,7 @@ def gyro_soft_calib():
 
 def gyro_del_create():
     global gyro
+    wait(100)
     del gyro
     try:
         gyro = GyroSensor(Port.S2, Direction.CLOCKWISE)
@@ -200,7 +235,6 @@ def gyro_del_create():
         ev3.speaker.beep()
         return
     gyro.reset_angle(0)
-
     for i in range(3):
         wait(100)
         angle = int(gyro.angle())
@@ -242,6 +276,7 @@ def gyro_read_angle():
             break 
 
 def gems2blackfwd(white_level,black_level, speed, port):
+    #wait(100)
     gyro.reset_angle(0)
     left_motor.reset_angle(0)
     right_motor.reset_angle(0)
@@ -324,6 +359,7 @@ def accDecGems(total_dist, start_speed = 30, top_speed = 300, acc_dist=0.2, dec_
     # I and D are not used.
     kp = 1.0
 
+    #wait(100)
     gyro.reset_angle(0)
     left_motor.reset_angle(0)
     right_motor.reset_angle(0)
@@ -367,6 +403,7 @@ def accDecGemsPID(total_dist, start_speed = 30, top_speed = 300, acc_dist=0.2, d
     error_d = 0
     error_i = 0
 
+    #wait(100)
     gyro.reset_angle(0)
     left_motor.reset_angle(0)
     right_motor.reset_angle(0)
@@ -395,6 +432,7 @@ def accDecGemsPID(total_dist, start_speed = 30, top_speed = 300, acc_dist=0.2, d
         wait(10)
 
 def gems(rotations,speed):
+    #wait(100)
     gyro.reset_angle(0)
     left_motor.reset_angle(0)
     right_motor.reset_angle(0)
@@ -432,6 +470,7 @@ def gyrospinturn(angle,speed):
     x=speed
     nx=-1*speed
     abs_angle = abs(angle)
+    #wait(100)
     gyro.reset_angle(0)
     if angle < 0:
         left_motor.run(nx)
@@ -580,7 +619,7 @@ def run1():
 def run2(color = 1):
     #Initialization
     #gyro_soft_calib()
-    gyro_del_create
+    gyro_del_create()
     left_medium_motor.stop()
     right_medium_motor.stop()
     
@@ -664,7 +703,6 @@ def run2(color = 1):
     left_medium_motor.run_time(-450,1500, Stop.BRAKE, True)
     # Raise the left arm to complete the mission.
     left_medium_motor.run_time(350,750, Stop.BRAKE, True)
-    #gyro_soft_calib()
 
     # *** Expert delivery - 2 (Collecting sound engineer)
     # Move forward little bit so that robot will not hit sound mixer in the rotation done below
@@ -680,8 +718,6 @@ def run2(color = 1):
     right_medium_motor.run_time(100, 750, Stop.BRAKE, True)
     
     # *** Mission: Augmented reality ***
-    # Re-init the gyro to reset the accumulated error (Make sure that the robot is still here)
-    #gyro_soft_calib()
     # Rotate towards the AR mission
     gyrospinturn(-82,150)
     # Move towards the AR mission
@@ -747,7 +783,7 @@ def run2(color = 1):
 #************************************************
 def run3():
     #gyro_soft_calib()
-    gyro_del_create
+    gyro_del_create()
     # Start from the base.
     # Reset the robot arms.
     run_parallel(resetleftmediummotor, resetrightmediummotor)
@@ -783,7 +819,7 @@ def run3():
 #************************************************
 def run4():
     #gyro_soft_calib()
-    gyro_del_create
+    gyro_del_create()
     # Start from the base
     # Reset the robot arms.
     run_parallel(resetleftmediummotor, resetrightmediummotor)
@@ -894,9 +930,12 @@ def test():
     robot.stop()
     ga = gyro.angle()
     ev3.screen.print("Gyro Angle: {}".format(ga))
-    wait(3000)
-    gems2blackfwd(0.95, 0.05, 100, 1)"""
-    accDecGemsPID(9, 30, 350, 0.1, 0.1)
+    gems2blackfwd(0.95, 0.05, 100, 1)
+    accDecGemsPID(9, 30, 350, 0.1, 0.1)"""
+    ev3.screen.print("Del/Add Gyro")
+    gyro_del_create()
+    ev3.screen.print("Gyro D/A complete")
+    wait(2000)
     robot.stop()
 
 #****************************************************
