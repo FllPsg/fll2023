@@ -577,8 +577,7 @@ def run1():
     run_parallel(resetleftmediummotor, resetrightmediummotor, movefrombase)
     gyrospinturn(-100, 200)
     # Bring the left arm down enough to align with the dragon head
-    left_medium_motor.reset_angle(0)
-    left_medium_motor.run_target(200,-70.5, Stop.BRAKE)
+    left_medium_motor.run_time(-200, 390, Stop.BRAKE)
     # Move towards the 3D cinea
     simplemovestraight(1.1,120)
     #Align to model (3D cenima)
@@ -630,10 +629,12 @@ def run2(color = 1):
     # Move forward towards the rolling camera orange lever
     accDecGems(2.75,30,350,0.3,0.3)
     # Rotate right slightly to aling the right robot arm just above the orange lever
+    wait(150)
     gyrospinturn(10, 150)
     # Lower down the right robot arm to push down the orange 1ever down
     right_medium_motor.run_time(-350,400, Stop.BRAKE, True)
     # Rotate left to bring back the robot to old direction
+    wait(150)
     gyrospinturn(-10, 150)
     # Reset rigt arm position
     right_medium_motor.run_time(350,500, Stop.BRAKE, True)
@@ -642,7 +643,7 @@ def run2(color = 1):
     wait(200)
 
     # Rotate towards the aligning line near theater scene change mission
-    gyrospinturn(-70, 150)
+    gyrospinturn(-70.1, 150)
     # Move straight to the aligning line
     accDecGems(2.75,30,350,0.3,0.3)
     gems2blackfwd(0.9,0.1, 100, 1)
@@ -656,7 +657,8 @@ def run2(color = 1):
     # Move back a little to give room for the right arm when brought down
     simplemovestraight(-0.25,100)
     # Rotate the robot to position aligning towards the stage manager
-    gyrospinturn(8,150)
+    wait(150)
+    gyrospinturn(7.75,150)
     # Bring the right arm down to align with the stage manager loop
     right_medium_motor.reset_angle(0)
     right_medium_motor.run_target(200, -76, Stop.BRAKE, True)
@@ -693,6 +695,7 @@ def run2(color = 1):
     # *** Mission: Immersive Experience ***
     # Spin rotate towards the immersive experience mission such that the left arm is in line with
     # the orange lever
+    wait(150)
     gyrospinturn(114, 150)
     #Move forward to the immersive experience mission
     accDecGems(1.4,30,250,0.3,0.3)
@@ -705,9 +708,11 @@ def run2(color = 1):
     left_medium_motor.run_time(350,750, Stop.BRAKE, True)
 
     # *** Expert delivery - 2 (Collecting sound engineer)
+    gyro_del_create()
     # Move forward little bit so that robot will not hit sound mixer in the rotation done below
     simplemovestraight(0.42,150)
     # Rotate towards the sound engineer. The right arm is in line with the loop of the sound engineer
+    wait(150)
     gyrospinturn(99.5,150)
     # Bring the right arm to pickup the sound engineer
     right_medium_motor.reset_angle(0)
@@ -737,16 +742,17 @@ def run2(color = 1):
     
     # *** Mission: Craft Creater - 1 (Opening the Printer) ***
     # Rotate towards VR craft createor mission
+    wait(150)
     gyrospinturn(56,150)
     # Reset the left arm
     left_medium_motor.run_time(350,750, Stop.BRAKE, True)
     # Bring up the left arm to level with the organge lid of the 3D printer
     left_medium_motor.reset_angle(0)
-    left_medium_motor.run_target(350,-91, Stop.BRAKE, True)
+    left_medium_motor.run_target(350,-87, Stop.BRAKE, True)
     # Move the robot left arm under the 3D printer's orange lid
-    simplemovestraight(0.61,150)
+    simplemovestraight(0.58,150)
     # Lift the lid up
-    left_medium_motor.run_time(150,1000, Stop.BRAKE, True)
+    left_medium_motor.run_time(175,1000, Stop.BRAKE, True)
 
     # *** Mission: Expert Delivery - 3 (Delivering Sound engineer) ***
     # Rotate left slightly to prepare to move towards the music concert destination area
